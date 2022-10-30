@@ -1,14 +1,13 @@
 package Tasks;
 
-public enum ProgressType {
+public enum Status {
     NEW ("Новая"),
     IN_PROGRESS ("В процессе"),
-    DONE ("Выполнена"),
-    CANCELLED("Отменена");
+    DONE ("Выполнена");
 
     final private String title;
 
-    ProgressType(String title) {
+    Status(String title) {
         this.title = title;
     }
 

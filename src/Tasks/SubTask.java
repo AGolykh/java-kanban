@@ -1,51 +1,31 @@
 package Tasks;
 
 public class SubTask extends Task {
-    protected int idEpic;
+    protected final int epicID;
 
-    // Конструктор для addTask
-    public SubTask(int idEpic, String name, String description) {
+    public SubTask(String name, String description, int epicID) {
         super(name, description);
-        this.idEpic = idEpic;
+        this.epicID = epicID;
     }
 
-    // Конструктор для mergeTask
-    protected SubTask(int idEpic, ProgressType type, String name, String description) {
-        super(type, name, description);
-        this.idEpic = idEpic;
+    public SubTask(int ID, Status status, String name, String description, int epicID) {
+        super(ID, status, name, description);
+        this.epicID = epicID;
     }
 
-    // Конструкторы для update
-    public SubTask(int idEpic, ProgressType type) {
-        super(type);
-        this.idEpic = idEpic;
+    public int getEpicID() {
+        return epicID;
     }
 
-    protected SubTask(int idEpic, String name) {
-        super(name);
-        this.idEpic = idEpic;
-    }
-
-    public int getIdEpic() {
-        return idEpic;
+    // Получить объект задачи
+    SubTask getTask() {
+        return this;
     }
 
     @Override
-    Object mergeTask(Object object) {
-        SubTask subTask = (SubTask) object;
-        this.idEpic = subTask.getIdEpic();
-
-        if (subTask.getType() != null) {
-            this.type = subTask.getType();
-        }
-
-        if (subTask.getName() != null) {
-            this.name = subTask.getName();
-        }
-
-        if (subTask.getDescription() != null) {
-            this.description = subTask.getDescription();
-        }
-        return new SubTask(this.idEpic, this.type, this.name, this.description);
+    public String toString() {
+        return ID + ". " + "Подзадача задачи " + epicID +
+                ", (" + status + ") " + name +
+                ": " + description + ". \n";
     }
 }
