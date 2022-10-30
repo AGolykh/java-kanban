@@ -27,11 +27,17 @@ public class Main {
 
         manager.update(3, Status.DONE, null, null);
 
+
+
         System.out.println(manager);
 
         System.out.println(manager.getSubTaskOfEpic(8));
 
-        manager.clearTaskList();
+        //manager.clearTaskList();
         System.out.println(manager);
+
+        System.out.println(manager.showTask());
+        System.out.println(manager.showEpic());
+        System.out.println(manager.showSubTask());
     }
 }

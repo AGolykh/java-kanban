@@ -32,6 +32,33 @@ public class Manager {
         return result;
     }
 
+    // Вывод списка задач
+    public String showTask() {
+        String result = "";
+        for(Integer ID : taskList.keySet()) {
+            result += taskList.get(ID);
+        }
+        return result;
+    }
+
+    // Вывод списка родительских задач
+    public String showEpic() {
+        String result = "";
+        for(Integer ID : epicList.keySet()) {
+            result += epicList.get(ID);
+        }
+        return result;
+    }
+
+    // Вывод списка подзадач
+    public String showSubTask() {
+        String result = "";
+        for(Integer ID : subTaskList.keySet()) {
+            result += subTaskList.get(ID);
+        }
+        return result;
+    }
+
     // Удаление ID из списка
     private void delFromListID(int ID) {
         for (Integer IDFromListID : listID) {
