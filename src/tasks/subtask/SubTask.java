@@ -1,4 +1,7 @@
-package tasks;
+package tasks.subtask;
+
+import tasks.Status;
+import tasks.task.Task;
 
 public class SubTask extends Task {
     protected final int epicId;

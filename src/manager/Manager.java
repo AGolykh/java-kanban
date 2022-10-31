@@ -1,5 +1,11 @@
-package tasks;
+package manager;
 
+import tasks.epic.Epic;
+import tasks.subtask.SubTask;
+import tasks.task.Task;
+import tasks.Status;
+
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 public class Manager {
@@ -23,61 +29,60 @@ public class Manager {
         return nextId++;
     }
 
-    // Получить список всех задач
-    public TreeMap<Integer, Object> getAllTasks() {
-        TreeMap<Integer, Object> result = new TreeMap<>();
+    // Получить список задач
+    public ArrayList<Task> getTaskList() {
+        ArrayList<Task> result = new ArrayList<>();
         for (Integer id : taskList.keySet()) {
-            result.put(taskList.get(id).getId(), taskList.get(id));
-        }
-        for (Integer id : epicList.keySet()) {
-            result.put(epicList.get(id).getId(), epicList.get(id));
-        }
-        for (Integer id : subTaskList.keySet()) {
-            result.put(subTaskList.get(id).getId(), subTaskList.get(id));
+            result.add(taskList.get(id));
         }
         return result;
     }
 
-    // Получить список задач
-    public TreeMap<Integer, Task> getTaskList() {
-        return taskList;
-    }
-
     // Получить список родительски задач
-    public TreeMap<Integer, Epic> getEpicList() {
-        return epicList;
+    public ArrayList<Epic> getEpicList() {
+        ArrayList<Epic> result = new ArrayList<>();
+        for (Integer id : epicList.keySet()) {
+            result.add(epicList.get(id));
+        }
+        return result;
     }
 
     // Получить список подзадач
-    public TreeMap<Integer, SubTask> getSubTaskList() {
-        return subTaskList;
+    public ArrayList<SubTask> getSubTaskList() {
+        ArrayList<SubTask> result = new ArrayList<>();
+        for (Integer id : subTaskList.keySet()) {
+            result.add(subTaskList.get(id));
+        }
+        return result;
+    }
+
+    // Получение всех подзадач определенного эпика
+    public ArrayList<SubTask> getSubTasksOfEpic(int id) {
+        ArrayList<SubTask> result = new ArrayList<>();
+        if (epicList.containsKey(id)) {
+            Epic epic = epicList.get(id);
+            for (Integer subTaskId : epic.getListSubTaskId()) {
+                if (subTaskList.containsKey(subTaskId)) {
+                    result.add(subTaskList.get(subTaskId));
+                }
+            }
+        }
+        return result;
     }
 
     // Получение задачи по идентификатору
     public Task getTask(int id) {
-        Task task = null;
-        if (taskList.containsKey(id)) {
-            task = taskList.get(id);
-        }
-        return task;
+        return taskList.get(id);
     }
 
     // Получение родительской задачи по идентификатору
     public Epic getEpic(int id) {
-        Epic epic = null;
-        if (epicList.containsKey(id)) {
-            epic = epicList.get(id);
-        }
-        return epic;
+        return epicList.get(id);
     }
 
     // Получение подзадачи по идентификатору
     public SubTask getSubTask(int id) {
-        SubTask subTask = null;
-        if (subTaskList.containsKey(id)) {
-            subTask = subTaskList.get(id);
-        }
-        return subTask;
+        return subTaskList.get(id);
     }
 
     // Добавить задачу
@@ -103,6 +108,7 @@ public class Manager {
             Epic epic = epicList.get(epicId);
             subTaskList.put(subTask.getId(), subTask);
             epic.addSubTaskId(id);
+            epicList.put(epicId, epic);
             checkStatus(id);
             System.out.println("Подзадача " + id + " добавлена в родительскую задачу " + epicId + '.');
         } else {
@@ -114,9 +120,19 @@ public class Manager {
     public void updateTask(int id, Task newTask) {
         if (taskList.containsKey(id)) {
             Task task = taskList.get(id);
-            if (newTask.getStatus() != null) task.setStatus(newTask.getStatus());
-            if (newTask.getName() != null) task.setName(newTask.getName());
-            if (newTask.getDescription() != null) task.setDescription(newTask.getDescription());
+
+            if (newTask.getStatus() != null) {
+                task.setStatus(newTask.getStatus());
+            }
+
+            if (newTask.getName() != null) {
+                task.setName(newTask.getName());
+            }
+
+            if (newTask.getDescription() != null) {
+                task.setDescription(newTask.getDescription());
+            }
+
             taskList.put(id, task);
             System.out.println("Задача " + id + " обновлена.");
         } else {
@@ -128,8 +144,15 @@ public class Manager {
     public void updateEpic(int id, Epic newEpic) {
         if (epicList.containsKey(id)) {
             Epic epic = epicList.get(id);
-            if (newEpic.getName() != null) epic.setName(newEpic.getName());
-            if (newEpic.getDescription() != null) epic.setDescription(newEpic.getDescription());
+
+            if (newEpic.getName() != null) {
+                epic.setName(newEpic.getName());
+            }
+
+            if (newEpic.getDescription() != null) {
+                epic.setDescription(newEpic.getDescription());
+            }
+
             epicList.put(id, epic);
             System.out.println("Родительская задача " + id + " обновлена.");
         } else {
@@ -142,9 +165,19 @@ public class Manager {
         if (subTaskList.containsKey(id)) {
             SubTask subTask = subTaskList.get(id);
             int epicId = subTask.getEpicId();
-            if (newSubTask.getStatus() != null) subTask.setStatus(newSubTask.getStatus());
-            if (newSubTask.getName() != null) subTask.setName(newSubTask.getName());
-            if (newSubTask.getDescription() != null) subTask.setDescription(newSubTask.getDescription());
+
+            if (newSubTask.getStatus() != null) {
+                subTask.setStatus(newSubTask.getStatus());
+            }
+
+            if (newSubTask.getName() != null) {
+                subTask.setName(newSubTask.getName());
+            }
+
+            if (newSubTask.getDescription() != null) {
+                subTask.setDescription(newSubTask.getDescription());
+            }
+
             subTaskList.put(id, subTask);
             checkStatus(epicId);
         } else {
@@ -228,9 +261,9 @@ public class Manager {
             for (Integer idSubTask : epic.getListSubTaskId()) {
                 SubTask subTask = subTaskList.get(idSubTask);
                 Status status = subTask.getStatus();
-                if (status.equals(Status.NEW)) {
+                if (Status.NEW.equals(status)) {
                     countOfNew++;
-                } else if (status.equals(Status.DONE)) {
+                } else if (Status.DONE.equals(status)) {
                     countOfDone++;
                 }
             }
@@ -244,19 +277,5 @@ public class Manager {
             }
             epicList.put(id, epic);
         }
-    }
-
-    // Получение всех подзадач определенного эпика
-    public TreeMap<Integer, SubTask> getSubTasksOfEpic(int id) {
-        TreeMap<Integer, SubTask> result = new TreeMap<>();
-        if (epicList.containsKey(id)) {
-            Epic epic = epicList.get(id);
-            for (Integer subTaskId : epic.getListSubTaskId()) {
-                if (subTaskList.containsKey(subTaskId)) {
-                    result.put(subTaskList.get(subTaskId).getId(), subTaskList.get(subTaskId));
-                }
-            }
-        }
-        return result;
     }
 }

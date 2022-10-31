@@ -1,4 +1,9 @@
-import tasks.*;
+import manager.Manager;
+
+import tasks.epic.Epic;
+import tasks.subtask.SubTask;
+import tasks.task.Task;
+import tasks.Status;
 
 public class Main {
     static Manager manager = new Manager();
@@ -62,14 +67,11 @@ public class Main {
         System.out.println(manager.getEpicList());
         System.out.println(manager.getSubTaskList());
 
-        System.out.println(manager.getAllTasks());
-
-
         manager.clearTaskList();
-        System.out.println(manager.getAllTasks());
+
         manager.clearSubTaskList();
-        System.out.println(manager.getAllTasks());
+
         manager.clearEpicList();
-        System.out.println(manager.getAllTasks());
+
     }
 }
