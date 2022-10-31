@@ -1,9 +1,9 @@
-package Tasks;
+package tasks;
 
 public enum Status {
-    NEW ("Новая"),
-    IN_PROGRESS ("В процессе"),
-    DONE ("Выполнена");
+    NEW("Новая"),
+    IN_PROGRESS("В процессе"),
+    DONE("Выполнена");
 
     final private String title;
 

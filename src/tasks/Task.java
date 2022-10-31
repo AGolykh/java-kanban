@@ -1,27 +1,29 @@
-package Tasks;
+package tasks;
 
 public class Task {
-    protected final int ID;
+    protected int id;
     protected Status status;
     protected String name;
     protected String description;
 
     public Task(String name, String description) {
-        this.ID = Manager.createID();
         this.status = Status.NEW;
         this.name = name;
         this.description = description;
     }
 
-    public Task(int ID, Status status, String name, String description) {
-        this.ID = ID;
+    public Task(Status status, String name, String description) {
         this.status = status;
         this.name = name;
         this.description = description;
     }
 
-    int getID() {
-        return ID;
+    int getId() {
+        return id;
+    }
+
+    void setId(int id) {
+        this.id = id;
     }
 
     Status getStatus() {
@@ -48,23 +50,14 @@ public class Task {
         this.description = description;
     }
 
-    // Получить объект задачи
-    Task getTask() {
-        return this;
-    }
-
-    // Обновленной задачи
-    void updateTask(Status status, String name, String description) {
-        this.setStatus(status == null ? this.status : status);
-        this.setName(name == null ? this.name : name);
-        this.setDescription(description == null ? this.description : description);
-    }
-
     @Override
     public String toString() {
-        return ID + ". " + "Задача" +
-                ", (" + status + ") " + name +
-                ": " + description + ". \n";
+        return "Task{"
+                + "id=" + id
+                + ", status=" + status
+                + ", name='" + name
+                + '\'' + ", description='" + description
+                + '\'' + '}';
     }
 }
 
