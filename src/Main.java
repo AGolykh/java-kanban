@@ -47,7 +47,7 @@ public class Main {
         System.out.println(manager.getEpicList());
         System.out.println(manager.getSubTaskList());
 
-        manager.updateSubTask(4, new SubTask(Status.DONE, null, null, 3));
+        manager.updateSubTask(10, new SubTask(Status.DONE, null, null, 9));
 
         System.out.println(manager.getTaskList());
         System.out.println(manager.getEpicList());

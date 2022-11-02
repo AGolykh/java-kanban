@@ -31,29 +31,17 @@ public class Manager {
 
     // Получить список задач
     public ArrayList<Task> getTaskList() {
-        ArrayList<Task> result = new ArrayList<>();
-        for (Integer id : taskList.keySet()) {
-            result.add(taskList.get(id));
-        }
-        return result;
+        return new ArrayList<>(taskList.values());
     }
 
     // Получить список родительски задач
     public ArrayList<Epic> getEpicList() {
-        ArrayList<Epic> result = new ArrayList<>();
-        for (Integer id : epicList.keySet()) {
-            result.add(epicList.get(id));
-        }
-        return result;
+        return new ArrayList<>(epicList.values());
     }
 
     // Получить список подзадач
     public ArrayList<SubTask> getSubTaskList() {
-        ArrayList<SubTask> result = new ArrayList<>();
-        for (Integer id : subTaskList.keySet()) {
-            result.add(subTaskList.get(id));
-        }
-        return result;
+        return new ArrayList<>(subTaskList.values());
     }
 
     // Получение всех подзадач определенного эпика
@@ -63,7 +51,7 @@ public class Manager {
             Epic epic = epicList.get(id);
             for (Integer subTaskId : epic.getListSubTaskId()) {
                 if (subTaskList.containsKey(subTaskId)) {
-                    result.add(subTaskList.get(subTaskId));
+                    result.add(getSubTask(subTaskId));
                 }
             }
         }
