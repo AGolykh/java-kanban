@@ -101,9 +101,12 @@ public class InMemoryTaskManager {
     public void updateTask(int id, Task newTask) {
         if (taskList.containsKey(id)) {
             Task task = taskList.get( id);
+            boolean changeFlag = false;
 
-            if (newTask.getStatus() != null) {
+            if ((newTask.getStatus() != null)
+                    && !newTask.getStatus().equals(task.getStatus())) {
                 task.setStatus(newTask.getStatus());
+                changeFlag = true;
             }
 
             if (newTask.getName() != null) {
