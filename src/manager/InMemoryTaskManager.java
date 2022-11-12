@@ -109,17 +109,21 @@ public class InMemoryTaskManager {
                 changeFlag = true;
             }
 
-            if (newTask.getName() != null) {
+            if ((newTask.getName() != null)
+                && !newTask.getName().equals(task.getName())) {
                 task.setName(newTask.getName());
                 changeFlag = true;
             }
 
             if (newTask.getDescription() != null) {
                 task.setDescription(newTask.getDescription());
+                changeFlag = true;
             }
 
-            taskList.put(id, task);
-            System.out.println("Задача " + id + " обновлена.");
+            if (changeFlag) {
+                taskList.put(id, task);
+                System.out.println("Задача " + id + " обновлена.");
+            }
         } else {
             System.out.println("Задача " + id + " не найдена.");
         }
