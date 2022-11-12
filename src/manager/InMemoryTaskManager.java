@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 public class InMemoryTaskManager {
-    private static int nextId;
+    private static int nextId = 1;
     private TreeMap<Integer, Task> taskList;
     private TreeMap<Integer, Epic> epicList;
     private TreeMap<Integer, SubTask> subTaskList;
@@ -20,15 +20,6 @@ public class InMemoryTaskManager {
         taskList = new TreeMap<>();
         epicList = new TreeMap<>();
         subTaskList = new TreeMap<>();
-    }
-
-    // Создание сквозного идентификатора задач
-    public static int createId() {
-        final int firstId = 1;
-        if (nextId == Integer.MAX_VALUE || nextId < firstId) {
-            nextId = firstId;
-        }
-        return nextId++;
     }
 
     // Получить список задач
@@ -77,21 +68,21 @@ public class InMemoryTaskManager {
 
     // Добавить задачу
     public void addTask(Task task) {
-        task.setId(createId());
+        task.setId(nextId++);
         taskList.put(task.getId(), task);
         System.out.println("Задача " + task.getId() + " добавлена.");
     }
 
     // Добавить родительскую задачу
     public void addEpic(Epic epic) {
-        epic.setId(createId());
+        epic.setId(nextId++);
         epicList.put(epic.getId(), epic);
         System.out.println("Родительская задача " + epic.getId() + " добавлена.");
     }
 
     // Добавить подзадачу
     public void addSubTask(SubTask subTask) {
-        subTask.setId(createId());
+        subTask.setId(nextId++);
         int id = subTask.getId();
         int epicId = subTask.getEpicId();
         if (epicList.containsKey(epicId)) {
