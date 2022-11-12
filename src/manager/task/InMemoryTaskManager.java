@@ -1,10 +1,10 @@
-package managers.task;
+package manager.task;
 
-import managers.history.HistoryManager;
-import tasks.DefaultTask;
-import tasks.epic.Epic;
-import tasks.subtask.SubTask;
-import tasks.task.Task;
+import manager.Managers;
+import manager.history.HistoryManager;
+import tasks.Epic;
+import tasks.SubTask;
+import tasks.Task;
 import tasks.Status;
 
 import java.util.ArrayList;
@@ -12,18 +12,18 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeMap;
 
-import static managers.history.InMemoryHistoryManager.history;
-
-public class InMemoryTaskManager implements TaskManager, HistoryManager {
+public class InMemoryTaskManager implements TaskManager {
     private static int nextId = 1;
     private TreeMap<Integer, Task> taskList;
     private TreeMap<Integer, Epic> epicList;
     private TreeMap<Integer, SubTask> subTaskList;
+    private HistoryManager history;
 
     public InMemoryTaskManager() {
         taskList = new TreeMap<>();
         epicList = new TreeMap<>();
         subTaskList = new TreeMap<>();
+        history = Managers.getDefaultHistory();
     }
 
     // Получить список задач
@@ -57,24 +57,24 @@ public class InMemoryTaskManager implements TaskManager, HistoryManager {
 
     // Получение задачи по идентификатору
     public Task getTask(int id) {
-        if(taskList.containsKey(id)) {
-            add(taskList.get(id));
+        if (taskList.containsKey(id)) {
+            history.add(taskList.get(id));
         }
         return taskList.get(id);
     }
 
     // Получение родительской задачи по идентификатору
     public Epic getEpic(int id) {
-        if(epicList.containsKey(id)) {
-            add(epicList.get(id));
+        if (epicList.containsKey(id)) {
+            history.add(epicList.get(id));
         }
         return epicList.get(id);
     }
 
     // Получение подзадачи по идентификатору
     public SubTask getSubTask(int id) {
-        if(subTaskList.containsKey(id)) {
-            add(subTaskList.get(id));
+        if (subTaskList.containsKey(id)) {
+            history.add(subTaskList.get(id));
         }
         return subTaskList.get(id);
     }
@@ -302,17 +302,7 @@ public class InMemoryTaskManager implements TaskManager, HistoryManager {
     }
 
     @Override
-    public void add(DefaultTask task) {
-        if (history.size() < 10) {
-            history.add(task);
-        } else {
-            history.remove(0);
-            history.add(task);
-        }
-    }
-
-    @Override
-    public ArrayList<DefaultTask> getHistory() {
-        return history;
+    public ArrayList<Task> getHistory() {
+        return history.getHistory();
     }
 }

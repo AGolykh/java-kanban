@@ -1,10 +1,8 @@
-package tasks.epic;
-
-import tasks.DefaultTask;
+package tasks;
 
 import java.util.ArrayList;
 
-public class Epic extends DefaultTask {
+public class Epic extends Task {
     public ArrayList<Integer> listSubTaskId;
 
     public Epic(String name, String description) {

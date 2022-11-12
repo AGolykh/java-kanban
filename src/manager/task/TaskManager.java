@@ -1,8 +1,8 @@
-package managers.task;
+package manager.task;
 
-import tasks.epic.Epic;
-import tasks.subtask.SubTask;
-import tasks.task.Task;
+import tasks.Epic;
+import tasks.SubTask;
+import tasks.Task;
 
 import java.util.ArrayList;
 
@@ -66,5 +66,7 @@ public interface TaskManager {
 
     // Проверка статуса эпика
     void checkStatus(int id);
+
+    ArrayList<Task> getHistory();
 }
 

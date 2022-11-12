@@ -1,18 +1,15 @@
-import managers.Managers;
-import managers.history.HistoryManager;
-import managers.task.TaskManager;
-import tasks.epic.Epic;
-import tasks.subtask.SubTask;
-import tasks.task.Task;
+import manager.Managers;
+import manager.task.TaskManager;
+import tasks.Epic;
+import tasks.SubTask;
+import tasks.Task;
 import tasks.Status;
 
 public class Main {
     static TaskManager taskManager;
-    static HistoryManager historyManager;
 
     public static void main(String[] args) {
         taskManager = Managers.getDefault();
-        historyManager = Managers.getDefaultHistory();
 
         // Для проверок
         taskManager.addTask(new Task("Задача 1", "Описание задачи 1"));
@@ -74,7 +71,6 @@ public class Main {
         System.out.println(taskManager.getEpic(9));
         System.out.println(taskManager.getSubTask(13)); // 10 элемент в списке
 
-        System.out.println(historyManager.getHistory());
-
+        System.out.println(taskManager.getHistory());
     }
 }

@@ -1,9 +1,6 @@
-package tasks.subtask;
+package tasks;
 
-import tasks.DefaultTask;
-import tasks.Status;
-
-public class SubTask extends DefaultTask {
+public class SubTask extends Task {
     protected final int epicId;
 
     public SubTask(String name, String description, int epicId) {

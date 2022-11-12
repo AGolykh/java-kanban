@@ -1,18 +1,18 @@
 package tasks;
 
-public abstract class DefaultTask {
+public class Task {
     protected int id;
     protected Status status;
     protected String name;
     protected String description;
 
-    public DefaultTask(String name, String description) {
+    public Task(String name, String description) {
         this.status = Status.NEW;
         this.name = name;
         this.description = description;
     }
 
-    public DefaultTask(Status status, String name, String description) {
+    public Task(Status status, String name, String description) {
         this.status = status;
         this.name = name;
         this.description = description;
@@ -50,4 +50,14 @@ public abstract class DefaultTask {
         this.description = description;
     }
 
+    @Override
+    public String toString() {
+        return "Task{"
+                + "id=" + id
+                + ", status=" + status
+                + ", name='" + name
+                + '\'' + ", description='" + description
+                + '\'' + '}';
+    }
 }
+
