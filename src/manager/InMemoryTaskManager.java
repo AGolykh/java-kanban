@@ -100,7 +100,7 @@ public class InMemoryTaskManager {
     // Обновить задачу
     public void updateTask(int id, Task newTask) {
         if (taskList.containsKey(id)) {
-            Task task = taskList.get( id);
+            Task task = taskList.get(id);
             boolean changeFlag = false;
 
             if ((newTask.getStatus() != null)
@@ -110,12 +110,13 @@ public class InMemoryTaskManager {
             }
 
             if ((newTask.getName() != null)
-                && !newTask.getName().equals(task.getName())) {
+                    && !newTask.getName().equals(task.getName())) {
                 task.setName(newTask.getName());
                 changeFlag = true;
             }
 
-            if (newTask.getDescription() != null) {
+            if ((newTask.getDescription() != null)
+                    && !newTask.getDescription().equals(task.getDescription())) {
                 task.setDescription(newTask.getDescription());
                 changeFlag = true;
             }
@@ -133,17 +134,24 @@ public class InMemoryTaskManager {
     public void updateEpic(int id, Epic newEpic) {
         if (epicList.containsKey(id)) {
             Epic epic = epicList.get(id);
+            boolean changeFlag = false;
 
-            if (newEpic.getName() != null) {
+            if ((newEpic.getName() != null)
+                    && !newEpic.getName().equals(epic.getName())) {
                 epic.setName(newEpic.getName());
+                changeFlag = true;
             }
 
-            if (newEpic.getDescription() != null) {
+            if ((newEpic.getDescription() != null)
+                    && !newEpic.getDescription().equals(epic.getDescription())) {
                 epic.setDescription(newEpic.getDescription());
+                changeFlag = true;
             }
 
-            epicList.put(id, epic);
-            System.out.println("Родительская задача " + id + " обновлена.");
+            if (changeFlag) {
+                epicList.put(id, epic);
+                System.out.println("Родительская задача " + id + " обновлена.");
+            }
         } else {
             System.out.println("Родительская задача " + id + " не найдена.");
         }
@@ -154,21 +162,31 @@ public class InMemoryTaskManager {
         if (subTaskList.containsKey(id)) {
             SubTask subTask = subTaskList.get(id);
             int epicId = subTask.getEpicId();
+            boolean changeFlag = false;
 
-            if (newSubTask.getStatus() != null) {
+            if ((newSubTask.getStatus() != null)
+                    && !newSubTask.getStatus().equals(subTask.getStatus())) {
                 subTask.setStatus(newSubTask.getStatus());
+                changeFlag = true;
             }
 
-            if (newSubTask.getName() != null) {
+            if ((newSubTask.getName() != null)
+                    && !newSubTask.getName().equals(subTask.getName())) {
                 subTask.setName(newSubTask.getName());
+                changeFlag = true;
             }
 
-            if (newSubTask.getDescription() != null) {
+            if ((newSubTask.getDescription() != null)
+                    && !newSubTask.getDescription().equals(subTask.getDescription())) {
                 subTask.setDescription(newSubTask.getDescription());
+                changeFlag = true;
             }
 
-            subTaskList.put(id, subTask);
-            checkStatus(epicId);
+            if (changeFlag) {
+                subTaskList.put(id, subTask);
+                System.out.println("Подзадача " + id + " не найдена.");
+                checkStatus(epicId);
+            }
         } else {
             System.out.println("Подзадача " + id + " не найдена.");
         }
