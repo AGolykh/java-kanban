@@ -1,5 +1,7 @@
-package manager;
+package managers.task;
 
+import managers.history.HistoryManager;
+import tasks.DefaultTask;
 import tasks.epic.Epic;
 import tasks.subtask.SubTask;
 import tasks.task.Task;
@@ -10,7 +12,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class InMemoryTaskManager {
+import static managers.history.InMemoryHistoryManager.history;
+
+public class InMemoryTaskManager implements TaskManager, HistoryManager {
     private static int nextId = 1;
     private TreeMap<Integer, Task> taskList;
     private TreeMap<Integer, Epic> epicList;
@@ -53,16 +57,25 @@ public class InMemoryTaskManager {
 
     // Получение задачи по идентификатору
     public Task getTask(int id) {
+        if(taskList.containsKey(id)) {
+            add(taskList.get(id));
+        }
         return taskList.get(id);
     }
 
     // Получение родительской задачи по идентификатору
     public Epic getEpic(int id) {
+        if(epicList.containsKey(id)) {
+            add(epicList.get(id));
+        }
         return epicList.get(id);
     }
 
     // Получение подзадачи по идентификатору
     public SubTask getSubTask(int id) {
+        if(subTaskList.containsKey(id)) {
+            add(subTaskList.get(id));
+        }
         return subTaskList.get(id);
     }
 
@@ -260,7 +273,7 @@ public class InMemoryTaskManager {
     }
 
     // Проверка статуса эпика
-    private void checkStatus(int id) {
+    public void checkStatus(int id) {
         if (epicList.containsKey(id)) {
             Set<Status> statusSet = new HashSet<>();
             Epic epic = epicList.get(id);
@@ -286,5 +299,20 @@ public class InMemoryTaskManager {
                 System.out.println("Статус родительской задачи " + id + " обновлен.");
             }
         }
+    }
+
+    @Override
+    public void add(DefaultTask task) {
+        if (history.size() < 10) {
+            history.add(task);
+        } else {
+            history.remove(0);
+            history.add(task);
+        }
+    }
+
+    @Override
+    public ArrayList<DefaultTask> getHistory() {
+        return history;
     }
 }

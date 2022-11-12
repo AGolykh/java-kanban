@@ -1,10 +1,10 @@
 package tasks.epic;
 
-import tasks.task.Task;
+import tasks.DefaultTask;
 
 import java.util.ArrayList;
 
-public class Epic extends Task {
+public class Epic extends DefaultTask {
     public ArrayList<Integer> listSubTaskId;
 
     public Epic(String name, String description) {
@@ -12,10 +12,12 @@ public class Epic extends Task {
         this.listSubTaskId = new ArrayList<>();
     }
 
+    // Получение списка подзадач
     public ArrayList<Integer> getListSubTaskId() {
         return listSubTaskId;
     }
 
+    // Добавление id подзадачи в список родительской
     public void addSubTaskId(int id) {
         listSubTaskId.add(id);
     }

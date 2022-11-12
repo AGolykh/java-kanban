@@ -1,15 +1,15 @@
-package history;
+package managers.history;
 
-import tasks.task.Task;
+import tasks.DefaultTask;
 
 import java.util.ArrayList;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    public static ArrayList<Task> history = new ArrayList<>();
+    public static ArrayList<DefaultTask> history = new ArrayList<>();
 
     // Добавление элемента в историю
     @Override
-    public void add(Task task) {
+    public void add(DefaultTask task) {
         if (history.size() < 10) {
             history.add(task);
         } else {
@@ -20,7 +20,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     // Вывод истории
     @Override
-    public ArrayList<Task> getHistory() {
+    public ArrayList<DefaultTask> getHistory() {
         return history;
     }
 }

@@ -1,9 +1,9 @@
 package tasks.subtask;
 
+import tasks.DefaultTask;
 import tasks.Status;
-import tasks.task.Task;
 
-public class SubTask extends Task {
+public class SubTask extends DefaultTask {
     protected final int epicId;
 
     public SubTask(String name, String description, int epicId) {
