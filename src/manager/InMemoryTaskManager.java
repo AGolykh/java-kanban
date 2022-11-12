@@ -111,6 +111,7 @@ public class InMemoryTaskManager {
 
             if (newTask.getName() != null) {
                 task.setName(newTask.getName());
+                changeFlag = true;
             }
 
             if (newTask.getDescription() != null) {
