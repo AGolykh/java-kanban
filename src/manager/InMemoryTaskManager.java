@@ -6,15 +6,17 @@ import tasks.task.Task;
 import tasks.Status;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeMap;
 
-public class Manager {
+public class InMemoryTaskManager {
     private static int nextId;
     private TreeMap<Integer, Task> taskList;
     private TreeMap<Integer, Epic> epicList;
     private TreeMap<Integer, SubTask> subTaskList;
 
-    public Manager() {
+    public InMemoryTaskManager() {
         taskList = new TreeMap<>();
         epicList = new TreeMap<>();
         subTaskList = new TreeMap<>();
@@ -243,27 +245,29 @@ public class Manager {
     // Проверка статуса эпика
     private void checkStatus(int id) {
         if (epicList.containsKey(id)) {
-            int countOfNew = 0;
-            int countOfDone = 0;
+            Set<Status> statusSet = new HashSet<>();
             Epic epic = epicList.get(id);
+            Status oldStatus = epic.getStatus();
             for (Integer idSubTask : epic.getListSubTaskId()) {
                 SubTask subTask = subTaskList.get(idSubTask);
-                Status status = subTask.getStatus();
-                if (Status.NEW.equals(status)) {
-                    countOfNew++;
-                } else if (Status.DONE.equals(status)) {
-                    countOfDone++;
-                }
+                statusSet.add(subTask.getStatus());
             }
 
-            if (countOfNew == epic.getListSubTaskId().size() || epic.getListSubTaskId().isEmpty()) {
+            if ((statusSet.contains(Status.NEW)
+                    && (statusSet.size() == 1))
+                    || statusSet.isEmpty()) {
                 epic.setStatus(Status.NEW);
-            } else if (countOfDone == epic.getListSubTaskId().size()) {
+            } else if (statusSet.contains(Status.DONE)
+                    && (statusSet.size() == 1)) {
                 epic.setStatus(Status.DONE);
             } else {
                 epic.setStatus(Status.IN_PROGRESS);
             }
             epicList.put(id, epic);
+
+            if (!oldStatus.equals(epic.getStatus())) {
+                System.out.println("Статус родительской задачи " + id + " обновлен.");
+            }
         }
     }
 }

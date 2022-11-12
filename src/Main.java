@@ -1,12 +1,11 @@
-import manager.Manager;
-
+import manager.InMemoryTaskManager;
 import tasks.epic.Epic;
 import tasks.subtask.SubTask;
 import tasks.task.Task;
 import tasks.Status;
 
 public class Main {
-    static Manager manager = new Manager();
+    static InMemoryTaskManager manager = new InMemoryTaskManager();
 
     public static void main(String[] args) {
         // Для проверок
