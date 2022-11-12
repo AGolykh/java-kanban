@@ -100,7 +100,7 @@ public class InMemoryTaskManager {
     // Обновить задачу
     public void updateTask(int id, Task newTask) {
         if (taskList.containsKey(id)) {
-            Task task = taskList.get(id);
+            Task task = taskList.get( id);
 
             if (newTask.getStatus() != null) {
                 task.setStatus(newTask.getStatus());
