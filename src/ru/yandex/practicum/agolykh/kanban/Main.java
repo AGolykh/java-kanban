@@ -1,13 +1,14 @@
-import managers.Managers;
-import task.TaskManager;
-import tasks.Epic;
-import tasks.SubTask;
-import tasks.Task;
-import tasks.Status;
+package ru.yandex.practicum.agolykh.kanban;
+
+import ru.yandex.practicum.agolykh.kanban.managers.Managers;
+import ru.yandex.practicum.agolykh.kanban.managers.task.TaskManager;
+import ru.yandex.practicum.agolykh.kanban.tasks.Epic;
+import ru.yandex.practicum.agolykh.kanban.tasks.SubTask;
+import ru.yandex.practicum.agolykh.kanban.tasks.Task;
+import ru.yandex.practicum.agolykh.kanban.tasks.Status;
 
 public class Main {
     static TaskManager taskManager;
-
     public static void main(String[] args) {
         taskManager = Managers.getDefault();
 

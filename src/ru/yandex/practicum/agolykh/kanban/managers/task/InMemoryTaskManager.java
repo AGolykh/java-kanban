@@ -1,11 +1,11 @@
-package task;
+package ru.yandex.practicum.agolykh.kanban.managers.task;
 
-import history.HistoryManager;
-import managers.Managers;
-import tasks.Epic;
-import tasks.SubTask;
-import tasks.Task;
-import tasks.Status;
+import ru.yandex.practicum.agolykh.kanban.managers.history.HistoryManager;
+import ru.yandex.practicum.agolykh.kanban.managers.Managers;
+import ru.yandex.practicum.agolykh.kanban.tasks.Epic;
+import ru.yandex.practicum.agolykh.kanban.tasks.SubTask;
+import ru.yandex.practicum.agolykh.kanban.tasks.Task;
+import ru.yandex.practicum.agolykh.kanban.tasks.Status;
 
 import java.util.ArrayList;
 import java.util.HashSet;

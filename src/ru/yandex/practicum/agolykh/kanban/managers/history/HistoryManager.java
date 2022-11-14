@@ -1,6 +1,6 @@
-package history;
+package ru.yandex.practicum.agolykh.kanban.managers.history;
 
-import tasks.Task;
+import ru.yandex.practicum.agolykh.kanban.tasks.Task;
 
 import java.util.ArrayList;
 

@@ -1,8 +1,8 @@
-package task;
+package ru.yandex.practicum.agolykh.kanban.managers.task;
 
-import tasks.Epic;
-import tasks.SubTask;
-import tasks.Task;
+import ru.yandex.practicum.agolykh.kanban.tasks.Epic;
+import ru.yandex.practicum.agolykh.kanban.tasks.SubTask;
+import ru.yandex.practicum.agolykh.kanban.tasks.Task;
 
 import java.util.ArrayList;
 

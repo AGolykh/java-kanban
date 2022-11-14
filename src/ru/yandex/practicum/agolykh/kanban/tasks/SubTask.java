@@ -1,4 +1,4 @@
-package tasks;
+package ru.yandex.practicum.agolykh.kanban.tasks;
 
 public class SubTask extends Task {
     protected final int epicId;
