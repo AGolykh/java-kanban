@@ -1,5 +1,5 @@
-import manager.Managers;
-import manager.task.TaskManager;
+import managers.Managers;
+import task.TaskManager;
 import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
