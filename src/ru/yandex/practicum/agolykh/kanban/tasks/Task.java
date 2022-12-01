@@ -1,7 +1,7 @@
 package ru.yandex.practicum.agolykh.kanban.tasks;
 
 public class Task {
-    protected int id;
+    protected Integer id;
     protected Status status;
     protected String name;
     protected String description;
@@ -34,6 +34,7 @@ public class Task {
         this.status = status;
     }
 
+
     public String getName() {
         return name;
     }
@@ -58,6 +59,19 @@ public class Task {
                 + ", name='" + name
                 + '\'' + ", description='" + description
                 + '\'' + '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Task task = (Task) obj;
+        return id.equals(task.id);
     }
 }
 

@@ -7,16 +7,13 @@ import ru.yandex.practicum.agolykh.kanban.tasks.SubTask;
 import ru.yandex.practicum.agolykh.kanban.tasks.Task;
 import ru.yandex.practicum.agolykh.kanban.tasks.Status;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     private static int nextId = 1;
-    private TreeMap<Integer, Task> taskList;
-    private TreeMap<Integer, Epic> epicList;
-    private TreeMap<Integer, SubTask> subTaskList;
+    private Map<Integer, Task> taskList;
+    private Map<Integer, Epic> epicList;
+    private Map<Integer, SubTask> subTaskList;
     private HistoryManager history;
 
     public InMemoryTaskManager() {
@@ -48,7 +45,7 @@ public class InMemoryTaskManager implements TaskManager {
             Epic epic = epicList.get(id);
             for (Integer subTaskId : epic.getListSubTaskId()) {
                 if (subTaskList.containsKey(subTaskId)) {
-                    result.add(getSubTask(subTaskId));
+                    result.add(subTaskList.get(subTaskId));
                 }
             }
         }
@@ -197,7 +194,7 @@ public class InMemoryTaskManager implements TaskManager {
 
             if (changeFlag) {
                 subTaskList.put(id, subTask);
-                System.out.println("Подзадача " + id + " не найдена.");
+                System.out.println("Подзадача " + id + " обновлена.");
                 checkStatus(epicId);
             }
         } else {
@@ -209,6 +206,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteTask(int id) {
         if (taskList.containsKey(id)) {
             taskList.remove(id);
+            history.remove(id);
             System.out.println("Задача " + id + " удалена.");
         } else {
             System.out.println("Задача " + id + " не найдена.");
@@ -221,10 +219,12 @@ public class InMemoryTaskManager implements TaskManager {
             for (Integer subTaskId : epicList.get(id).getListSubTaskId()) {
                 if (subTaskList.containsKey(subTaskId)) {
                     subTaskList.remove(subTaskId);
+                    history.remove(subTaskId);
                     System.out.println("Подзадача " + subTaskId + " удалена.");
                 }
             }
             epicList.remove(id);
+            history.remove(id);
             System.out.println("Задача " + id + " удалена.");
         } else {
             System.out.println("Задача " + id + " не найдена.");
@@ -239,6 +239,7 @@ public class InMemoryTaskManager implements TaskManager {
             Epic epic = epicList.get(epicId);
             epic.delSubTaskId(id);
             subTaskList.remove(id);
+            history.remove(id);
             epicList.put(epicId, epic);
             checkStatus(epicId);
             System.out.println("Подзадача " + id + " удалена.");
