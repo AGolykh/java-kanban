@@ -68,5 +68,7 @@ public interface TaskManager {
     void checkStatus(int id);
 
     ArrayList<Task> getHistory();
+
+    int countOfNodes();
 }
 

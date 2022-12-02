@@ -35,7 +35,6 @@ public class Main {
         System.out.println(taskManager.getEpicList());
         System.out.println(taskManager.getSubTaskList());
 
-
         System.out.println(taskManager.getTaskList());
         System.out.println(taskManager.getEpicList());
         System.out.println(taskManager.getSubTaskList());
@@ -93,6 +92,9 @@ public class Main {
         System.out.println(taskManager.getEpic(3));
         System.out.println(taskManager.getTask(1));
         System.out.println(taskManager.getTask(2));
+        System.out.println(taskManager.getSubTask(7));
+        System.out.println(taskManager.getSubTask(8));
+        System.out.println(taskManager.getSubTask(7));
         System.out.println(taskManager.getSubTask(13));
         System.out.println(taskManager.getSubTask(15));
         System.out.println(taskManager.getSubTask(13));
@@ -100,9 +102,9 @@ public class Main {
         System.out.println(taskManager.getSubTask(12));
         System.out.println(taskManager.getSubTask(13));
 
-
         taskManager.deleteEpic(10);
         System.out.println(taskManager.getHistory());
+        System.out.println(taskManager.countOfNodes());
 
         long time = System.currentTimeMillis() - startTime;
         System.out.println(time);

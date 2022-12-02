@@ -7,14 +7,14 @@ import java.util.HashMap;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private HashMap<Integer, Node> nodeMap= new HashMap<>();
-    public Node head;
-    public Node tail;
+    private Node head;
+    private Node tail;
     private int size = 0;
 
-    class Node  {
-        public Task data;
-        public Node next;
-        public Node prev;
+    static class Node  {
+        private Task data;
+        private Node next;
+        private Node prev;
 
         public Node(Node prev, Task data, Node next) {
             this.data = data;
@@ -24,7 +24,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     //Добавление элемент в конец
-    public void linkLast(Task task) {
+    private void linkLast(Task task) {
         final Node lastElement = tail;
         final Node newElement = new Node(lastElement, task, null);
         tail = newElement;
@@ -39,43 +39,49 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     //Удаление ноды в связанном списке
-    public void removeNode(Node node) {
-        for(Node i = head; i != null; i = i.next) {
-            if (i.data.equals(node.data)) {
-                nodeMap.remove(node.data.getId());
-                delLink(i);
-            }
-        }
+    private void removeNode(Node node) {
+        nodeMap.remove(node.data.getId());
+        delLink(node);
     }
 
-    public void delLink(Node i) {
-        final Node next = i.next;
-        final Node prev = i.prev;
+    //Изменение ссылок в соседних нодах
+    private void delLink(Node node) {
+        final Node next = node.next;
+        final Node prev = node.prev;
 
         if (prev == null) {
             head = next;
         } else {
             prev.next = next;
-            i.prev = null;
+            node.prev = null;
         }
 
         if (next == null) {
             tail = prev;
         } else {
             next.prev = prev;
-            i.next = null;
+            node.next = null;
         }
-        i.data = null;
+        node.data = null;
         size--;
     }
 
     //Получить список задач
-    public ArrayList<Task> getTasks() {
+    private ArrayList<Task> getTasks() {
         ArrayList<Task> result = new ArrayList<>();
-        for(Node i = tail; i != null; i = i.prev) {
-            result.add(i.data);
+        Node node = tail;
+
+        while (node != null) {
+            result.add(node.data);
+            node = node.prev;
         }
         return result;
+    }
+
+    //Получить количество элементов
+    @Override
+    public int countOfNodes() {
+        return size;
     }
 
     // Добавление элемента в историю
@@ -83,15 +89,15 @@ public class InMemoryHistoryManager implements HistoryManager {
     public void add(Task task) {
         if (nodeMap.containsKey(task.getId())) {
             remove(task.getId());
-            linkLast(task);
-        } else {
-            linkLast(task);
         }
+        linkLast(task);
     }
 
     @Override
     public void remove(int id) {
-        removeNode(nodeMap.get(id));
+        if(nodeMap.containsKey(id)) {
+            removeNode(nodeMap.get(id));
+        }
     }
 
     // Вывод истории
@@ -100,7 +106,5 @@ public class InMemoryHistoryManager implements HistoryManager {
         return getTasks();
     }
 
-    public int getSize() {
-        return size;
-    }
+
 }
