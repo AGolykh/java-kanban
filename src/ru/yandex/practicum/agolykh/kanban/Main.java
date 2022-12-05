@@ -20,16 +20,16 @@ public class Main {
         taskManager.addSubTask(new SubTask("Подзадача 1", "Описание подзадачи 1", 3));
         taskManager.addSubTask(new SubTask("Подзадача 2", "Описание подзадачи 2", 3));
         taskManager.addEpic(new Epic("Эпик 2", "Описание эпика 2"));
-        taskManager.addSubTask(new SubTask("Подзадача 1", "Описание подзадачи 1", 6));
-        taskManager.addSubTask(new SubTask("Подзадача 2", "Описание подзадачи 2", 6));
+        taskManager.addSubTask(new SubTask("Подзадача 3", "Описание подзадачи 1", 6));
+        taskManager.addSubTask(new SubTask("Подзадача 4", "Описание подзадачи 2", 6));
         taskManager.addTask(new Task("Задача 3", "Описание задачи 3"));
         taskManager.addEpic(new Epic("Эпик 3", "Описание эпика 3"));
-        taskManager.addSubTask(new SubTask("Подзадача 1", "Описание подзадачи 1", 10));
-        taskManager.addSubTask(new SubTask("Подзадача 2", "Описание подзадачи 2", 10));
-        taskManager.addSubTask(new SubTask("Подзадача 3", "Описание подзадачи 3", 10));
-        taskManager.addSubTask(new SubTask("Подзадача 4", "Описание подзадачи 4", 10));
-        taskManager.addSubTask(new SubTask("Подзадача 5", "Описание подзадачи 5", 10));
-        taskManager.addSubTask(new SubTask("Подзадача 6", "Описание подзадачи 6", 10));
+        taskManager.addSubTask(new SubTask("Подзадача 5", "Описание подзадачи 1", 10));
+        taskManager.addSubTask(new SubTask("Подзадача 6", "Описание подзадачи 2", 10));
+        taskManager.addSubTask(new SubTask("Подзадача 7", "Описание подзадачи 3", 10));
+        taskManager.addSubTask(new SubTask("Подзадача 8", "Описание подзадачи 4", 10));
+        taskManager.addSubTask(new SubTask("Подзадача 9", "Описание подзадачи 5", 10));
+        taskManager.addSubTask(new SubTask("Подзадача 10", "Описание подзадачи 6", 10));
 
         System.out.println(taskManager.getTaskList());
         System.out.println(taskManager.getEpicList());
