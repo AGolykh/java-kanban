@@ -1,18 +1,14 @@
 package ru.yandex.practicum.agolykh.kanban.tasks;
 
 public enum Status {
-    NEW("Новая"),
-    IN_PROGRESS("В процессе"),
-    DONE("Выполнена");
+    NEW, IN_PROGRESS, DONE;
 
-    final private String title;
-
-    Status(String title) {
-        this.title = title;
-    }
-
-    @Override
-    public String toString() {
-        return title;
+    public static Status of(String value) {
+        return switch(value) {
+            case("DONE") -> DONE;
+            case("IN_PROGRESS") -> IN_PROGRESS;
+            case("NEW") -> NEW;
+            default -> null;
+        };
     }
 }

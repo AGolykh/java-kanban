@@ -10,11 +10,11 @@ import ru.yandex.practicum.agolykh.kanban.tasks.Status;
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    private static int nextId = 1;
-    private Map<Integer, Task> taskList;
-    private Map<Integer, Epic> epicList;
-    private Map<Integer, SubTask> subTaskList;
-    private HistoryManager history;
+    private static int nextId = 0;
+    protected final Map<Integer, Task> taskList;
+    protected final Map<Integer, Epic> epicList;
+    protected final Map<Integer, SubTask> subTaskList;
+    protected final HistoryManager history;
 
     public InMemoryTaskManager() {
         taskList = new TreeMap<>();
@@ -76,23 +76,30 @@ public class InMemoryTaskManager implements TaskManager {
         return subTaskList.get(id);
     }
 
+    // Расстановка id
+    private Integer makeId(Integer id) {
+        int result;
+        result = Objects.requireNonNullElseGet(id, () -> ++nextId);
+        return result;
+    }
+
     // Добавить задачу
     public void addTask(Task task) {
-        task.setId(nextId++);
+        task.setId(makeId(task.getId()));
         taskList.put(task.getId(), task);
         System.out.println("Задача " + task.getId() + " добавлена.");
     }
 
     // Добавить родительскую задачу
     public void addEpic(Epic epic) {
-        epic.setId(nextId++);
+        epic.setId(makeId(epic.getId()));
         epicList.put(epic.getId(), epic);
         System.out.println("Родительская задача " + epic.getId() + " добавлена.");
     }
 
     // Добавить подзадачу
     public void addSubTask(SubTask subTask) {
-        subTask.setId(nextId++);
+        subTask.setId(makeId(subTask.getId()));
         int id = subTask.getId();
         int epicId = subTask.getEpicId();
         if (epicList.containsKey(epicId)) {

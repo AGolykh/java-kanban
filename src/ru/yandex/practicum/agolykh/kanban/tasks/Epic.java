@@ -7,6 +7,13 @@ public class Epic extends Task {
 
     public Epic(String name, String description) {
         super(name, description);
+        this.type = TaskTypes.EPIC;
+        this.listSubTaskId = new ArrayList<>();
+    }
+
+    public Epic(String value) {
+        super(value);
+        this.type = TaskTypes.EPIC;
         this.listSubTaskId = new ArrayList<>();
     }
 
@@ -34,11 +41,23 @@ public class Epic extends Task {
     public String toString() {
         return "Epic{"
                 + "id=" + id
-                + ", status=" + status
+                + ", type=" + type
                 + ", name='" + name
-                + '\'' + ", description='" + description
-                + '\'' + "listSubTasksId=" + listSubTaskId
+                + ", description='" + description
+                + ", listSubTasksId=" + listSubTaskId
                 + '}';
+    }
+
+    public static String toString(Epic epic) {
+        return String.valueOf(epic.getId()) +
+                ',' +
+                epic.getType() +
+                ',' +
+                epic.getStatus() +
+                ',' +
+                epic.getName() +
+                ',' +
+                epic.getDescription();
     }
 }
 

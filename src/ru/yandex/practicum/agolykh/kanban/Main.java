@@ -1,17 +1,20 @@
 package ru.yandex.practicum.agolykh.kanban;
 
-import ru.yandex.practicum.agolykh.kanban.managers.Managers;
+import ru.yandex.practicum.agolykh.kanban.managers.task.FileBackedTasksManager;
 import ru.yandex.practicum.agolykh.kanban.managers.task.TaskManager;
 import ru.yandex.practicum.agolykh.kanban.tasks.Epic;
 import ru.yandex.practicum.agolykh.kanban.tasks.SubTask;
 import ru.yandex.practicum.agolykh.kanban.tasks.Task;
 import ru.yandex.practicum.agolykh.kanban.tasks.Status;
 
+import java.io.File;
+
 public class Main {
     static TaskManager taskManager;
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
-        taskManager = Managers.getDefault();
+        taskManager = new FileBackedTasksManager();
+                //Managers.getDefault();
 
         // Для проверок
         taskManager.addTask(new Task("Задача 1", "Описание задачи 1"));
@@ -106,6 +109,16 @@ public class Main {
         System.out.println(taskManager.getHistory());
         System.out.println(taskManager.countOfNodes());
 
+        final String dir = System.getProperty("user.dir") + "\\resources\\";
+        final String fileName = "Tasks.csv";
+        final String path = dir + fileName;
+        TaskManager fromFile = FileBackedTasksManager.loadFromFile(new File(path));
+        System.out.println(fromFile.getTaskList());
+        System.out.println(fromFile.getEpicList());
+        System.out.println(fromFile.getSubTaskList());
+        System.out.println(fromFile.getHistory());
+
+        fromFile.addSubTask(new SubTask("Подзадача 10", "Описание подзадачи 6", 3));
         long time = System.currentTimeMillis() - startTime;
         System.out.println(time);
     }
