@@ -16,12 +16,6 @@ public class SubTask extends Task {
         this.epicId = epicId;
     }
 
-    public SubTask(String value) {
-        super(value);
-        this.type = TaskTypes.SUBTASK;
-        this.epicId = Integer.parseInt(value.split(",")[5]);
-    }
-
     public int getEpicId() {
         return epicId;
     }
@@ -35,19 +29,5 @@ public class SubTask extends Task {
                 + ", description='" + description
                 + ", epicId='" + epicId
                 + '}';
-    }
-
-    public static String toString(SubTask subTask) {
-        return String.valueOf(subTask.getId()) +
-                ',' +
-                subTask.getType() +
-                ',' +
-                subTask.getStatus() +
-                ',' +
-                subTask.getName() +
-                ',' +
-                subTask.getDescription() +
-                ',' +
-                subTask.getEpicId();
     }
 }

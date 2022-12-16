@@ -1,27 +1,20 @@
 package ru.yandex.practicum.agolykh.kanban.managers.task;
 
+import ru.yandex.practicum.agolykh.kanban.exceptions.ManagerSaveException;
 import ru.yandex.practicum.agolykh.kanban.managers.history.HistoryManager;
 import ru.yandex.practicum.agolykh.kanban.tasks.Epic;
 import ru.yandex.practicum.agolykh.kanban.tasks.SubTask;
 import ru.yandex.practicum.agolykh.kanban.tasks.Task;
-import ru.yandex.practicum.agolykh.kanban.tasks.TaskTypes;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 
-public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
+public class FileBackedTasksManager extends InMemoryTaskManager {
     private final String dir = System.getProperty("user.dir") + "\\resources\\";
     private final String fileName = "Tasks.csv";
     private final String path = dir + fileName;
-
-    private static class ManagerSaveException extends Exception {
-        public ManagerSaveException(final String message) {
-            super(message);
-        }
-    }
 
     // Создание экземпляра класса с данными из файла
     public static FileBackedTasksManager loadFromFile(File file) {
@@ -34,13 +27,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                         && !line.equals("id,type,status,name,description,epicId")) {
                     String typeTask = line.split(",")[1];
                     switch (typeTask) {
-                        case "TASK" -> result.addTask(result.fromString(line));
-                        case "SUBTASK" -> result.addSubTask((SubTask) result.fromString(line));
-                        case "EPIC" -> result.addEpic((Epic) result.fromString(line));
+                        case "TASK" -> result.addTask(Converter.taskFromString(line));
+                        case "SUBTASK" -> result.addSubTask(Converter.subTaskFromString(line));
+                        case "EPIC" -> result.addEpic(Converter.epicFromString(line));
                         default -> {
-                            TreeMap<Integer, Task> allTask = result.mergeTypes();
                             for (Integer id : historyFromString(line)) {
-                                result.history.add(allTask.get(id));
+                                if (result.taskList.containsKey(id)) {
+                                    result.history.add(result.taskList.get(id));
+                                } else if (result.epicList.containsKey(id)) {
+                                    result.history.add(result.epicList.get(id));
+                                } else if (result.subTaskList.containsKey(id)) {
+                                    result.history.add(result.subTaskList.get(id));
+                                }
                             }
                         }
                     }
@@ -48,83 +46,58 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             }
             return result;
         } catch (IOException e) {
-            System.out.println("Произошла ошибка во время чтения файла.");
+            throw new ManagerSaveException("Произошла ошибка при импорте данных из файла.");
         }
-        return null;
     }
 
-    // Восстановление истории с сохранением позиций в списке
-    public static List<Integer> historyFromString(String value) {
-        List<Integer> result = new ArrayList<>();
-        String[] ids = value.split(",");
-
-        for(int i = ids.length - 1; i >=0; i--) {
-            result.add(Integer.parseInt(ids[i]));
-        }
-        return result;
-    }
 
     // Сохранение в файл
     private void save() {
-        try  {
-            try (Writer fw = new FileWriter(path)) {
-                TreeMap<Integer, Task> allTasks = mergeTypes();
-                fw.write("id,type,status,name,description,epicId\n");
-                for (Task task : allTasks.values()) {
-                    fw.write(fromTask(task));
-                    fw.write("\n");
-                }
-                fw.write("\n");
-                fw.write(historyToString(history));
-            } catch (IOException e) {
-                throw new ManagerSaveException("Произошла ошибка во время записи в файл.");
+        try (Writer fw = new FileWriter(path))  {
+            fw.write("id,type,status,name,description,epicId\n");
+            for (Task value : taskList.values()) {
+                fw.write(fromTask(value));
             }
-        } catch (ManagerSaveException e) {
-            System.out.println(e.getMessage());
+            for (Task value : epicList.values()) {
+                fw.write(fromTask(value));
+            }
+            for (Task value : subTaskList.values()) {
+                fw.write(fromTask(value));
+            }
+            fw.write("\n");
+            fw.write(historyToString(history));
+        } catch (IOException e) {
+            throw new ManagerSaveException("Произошла ошибка при записи.");
         }
-    }
-
-    // Объединение списков
-    private TreeMap<Integer, Task> mergeTypes() {
-        TreeMap<Integer, Task> treeMap = new TreeMap<>();
-        treeMap.putAll(taskList);
-        treeMap.putAll(epicList);
-        treeMap.putAll(subTaskList);
-        return treeMap;
-    }
-
-    // Получение экземпляра класса из строки
-    private Task fromString(String value) {
-        String[] elements = value.split(",");
-        return switch(elements[1]) {
-            case ("TASK") -> new Task(value);
-            case ("EPIC") -> new Epic(value);
-            case ("SUBTASK") -> new SubTask(value);
-            default -> null;
-        };
     }
 
     //Получение строки в зависимости от типа задачи
     private String fromTask(Task task) {
-       String result = "";
-       if (task.getType().equals(TaskTypes.TASK)) {
-           result = Task.toString(task);
-       } else if (task.getType().equals(TaskTypes.EPIC)) {
-           result = Epic.toString((Epic) task);
-       } else if (task.getType().equals(TaskTypes.SUBTASK)) {
-           result = SubTask.toString((SubTask) task);
-       }
-       return result;
-   }
+        return switch (task.getType()) {
+            case TASK, EPIC -> Converter.taskToString(task);
+            case SUBTASK -> Converter.subTaskToString((SubTask) task);
+        };
+    }
 
     //Получение идентификаторов задач из истории в виде строки
     static String historyToString(HistoryManager manager) {
         StringBuilder idsFromHistory = new StringBuilder();
-        for (Task task: manager.getHistory()) {
+        for (Task task : manager.getHistory()) {
             idsFromHistory.append(task.getId())
-                            .append(",");
+                    .append(",");
         }
         return idsFromHistory.toString();
+    }
+
+    // Восстановление истории с сохранением позиций в списке
+    private static List<Integer> historyFromString(String value) {
+        List<Integer> result = new ArrayList<>();
+        String[] ids = value.split(",");
+
+        for (int i = ids.length - 1; i >= 0; i--) {
+            result.add(Integer.parseInt(ids[i]));
+        }
+        return result;
     }
 
     @Override

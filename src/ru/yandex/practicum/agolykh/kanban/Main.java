@@ -1,5 +1,6 @@
 package ru.yandex.practicum.agolykh.kanban;
 
+import ru.yandex.practicum.agolykh.kanban.exceptions.ManagerSaveException;
 import ru.yandex.practicum.agolykh.kanban.managers.task.FileBackedTasksManager;
 import ru.yandex.practicum.agolykh.kanban.managers.task.TaskManager;
 import ru.yandex.practicum.agolykh.kanban.tasks.Epic;
@@ -110,15 +111,21 @@ public class Main {
         System.out.println(taskManager.countOfNodes());
 
         final String dir = System.getProperty("user.dir") + "\\resources\\";
-        final String fileName = "Tasks.csv";
+        final String fileName = "Tasks2.csv"; // Тут можно заменить на Task.csv
         final String path = dir + fileName;
-        TaskManager fromFile = FileBackedTasksManager.loadFromFile(new File(path));
-        System.out.println(fromFile.getTaskList());
-        System.out.println(fromFile.getEpicList());
-        System.out.println(fromFile.getSubTaskList());
-        System.out.println(fromFile.getHistory());
-
-        fromFile.addSubTask(new SubTask("Подзадача 10", "Описание подзадачи 6", 3));
+        TaskManager fromFile;
+        try {
+            fromFile = FileBackedTasksManager.loadFromFile(new File(path));
+            System.out.println(fromFile.getTaskList());
+            System.out.println(fromFile.getEpicList());
+            System.out.println(fromFile.getSubTaskList());
+            System.out.println(fromFile.getHistory());
+            fromFile.addSubTask(new SubTask("Подзадача 10", "Описание подзадачи 6", 3));
+            System.out.println(fromFile.getEpic(3));
+            System.out.println(fromFile.getSubTask(4));
+        } catch (ManagerSaveException e) {
+            System.out.println(e.getMessage());
+        }
         long time = System.currentTimeMillis() - startTime;
         System.out.println(time);
     }
