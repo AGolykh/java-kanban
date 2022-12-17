@@ -1,23 +1,24 @@
 package ru.yandex.practicum.agolykh.kanban.tasks;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Epic extends Task {
-    public ArrayList<Integer> listSubTaskId;
+    public Set<Integer> listSubTaskId;
 
     public Epic(String name, String description) {
         super(name, description);
         this.type = TaskTypes.EPIC;
-        this.listSubTaskId = new ArrayList<>();
+        this.listSubTaskId = new HashSet<>();
     }
 
     public Epic(Status status, String name, String description) {
         super(status, name, description);
-        this.listSubTaskId = new ArrayList<>();
+        this.listSubTaskId = new HashSet<>();
     }
 
     // Получение списка подзадач
-    public ArrayList<Integer> getListSubTaskId() {
+    public Set<Integer> getListSubTaskId() {
         return listSubTaskId;
     }
 

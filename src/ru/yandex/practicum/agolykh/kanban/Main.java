@@ -111,7 +111,7 @@ public class Main {
         System.out.println(taskManager.countOfNodes());
 
         final String dir = System.getProperty("user.dir") + "\\resources\\";
-        final String fileName = "Tasks2.csv"; // Тут можно заменить на Task.csv
+        final String fileName = "Tasks.csv"; // Тут можно заменить на Tasks.csv
         final String path = dir + fileName;
         TaskManager fromFile;
         try {

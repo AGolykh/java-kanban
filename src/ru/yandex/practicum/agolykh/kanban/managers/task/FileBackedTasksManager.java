@@ -28,7 +28,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                     String typeTask = line.split(",")[1];
                     switch (typeTask) {
                         case "TASK" -> result.addTask(Converter.taskFromString(line));
-                        case "SUBTASK" -> result.addSubTask(Converter.subTaskFromString(line));
+                        case "SUBTASK" -> {
+                            SubTask subTask = Converter.subTaskFromString(line);
+                            result.subTaskList.put(subTask.getId(), subTask);
+                        }
                         case "EPIC" -> result.addEpic(Converter.epicFromString(line));
                         default -> {
                             for (Integer id : historyFromString(line)) {
@@ -42,7 +45,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                             }
                         }
                     }
+
                 }
+            }
+            for (SubTask subTask: result.subTaskList.values()) {
+                Epic epic = result.epicList.get(subTask.getEpicId());
+                epic.addSubTaskId(subTask.getId());
+                result.epicList.put(epic.getId(), epic);
             }
             return result;
         } catch (IOException e) {
