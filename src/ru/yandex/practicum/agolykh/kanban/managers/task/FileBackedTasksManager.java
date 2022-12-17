@@ -45,10 +45,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                             }
                         }
                     }
-
                 }
             }
-            for (SubTask subTask: result.subTaskList.values()) {
+            for (SubTask subTask : result.subTaskList.values()) {
                 Epic epic = result.epicList.get(subTask.getEpicId());
                 epic.addSubTaskId(subTask.getId());
                 result.epicList.put(epic.getId(), epic);
@@ -62,7 +61,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     // Сохранение в файл
     private void save() {
-        try (Writer fw = new FileWriter(path))  {
+        try (Writer fw = new FileWriter(path)) {
             fw.write("id,type,status,name,description,epicId\n");
             for (Task value : taskList.values()) {
                 fw.write(fromTask(value));
