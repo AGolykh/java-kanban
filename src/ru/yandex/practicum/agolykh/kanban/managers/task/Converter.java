@@ -3,12 +3,16 @@ package ru.yandex.practicum.agolykh.kanban.managers.task;
 import ru.yandex.practicum.agolykh.kanban.tasks.*;
 
 public class Converter {
+
+
     public static Task taskFromString(String value) {
         String[] elements = value.split(",");
         Task result = new Task(
                 Status.of(elements[2]),
                 elements[3],
-                elements[4]);
+                elements[4],
+                Integer.parseInt(elements[5]),
+                elements[6]);
         result.setId(Integer.parseInt(elements[0]));
         return result;
     }
@@ -29,7 +33,9 @@ public class Converter {
                 Status.of(elements[2]),
                 elements[3],
                 elements[4],
-                Integer.parseInt(elements[5]));
+                Integer.parseInt(elements[5]),
+                Integer.parseInt(elements[6]),
+                elements[7]);
         result.setId(Integer.parseInt(elements[0]));
         return result;
     }
@@ -39,7 +45,10 @@ public class Converter {
                 task.getType() + ',' +
                 task.getStatus() + ',' +
                 task.getName() + ',' +
-                task.getDescription() + "\n";
+                task.getDescription() + ',' +
+                task.getDuration().toMinutes() + ',' +
+                task.getStartTime().format(task.getFormatter()) + ',' +
+                task.getEndTime().format(task.getFormatter()) + "\n";
     }
 
     public static String subTaskToString(SubTask subTask) {
@@ -48,6 +57,9 @@ public class Converter {
                 subTask.getStatus() + ',' +
                 subTask.getName() + ',' +
                 subTask.getDescription() + ',' +
-                subTask.getEpicId() + "\n";
+                subTask.getEpicId() + ',' +
+                subTask.getDuration().toMinutes() + ',' +
+                subTask.getStartTime().format(subTask.getFormatter()) + ',' +
+                subTask.getEndTime().format(subTask.getFormatter()) + "\n";
     }
 }

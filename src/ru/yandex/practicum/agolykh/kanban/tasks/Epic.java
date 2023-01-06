@@ -14,6 +14,7 @@ public class Epic extends Task {
 
     public Epic(Status status, String name, String description) {
         super(status, name, description);
+        this.type = TaskTypes.EPIC;
         this.listSubTaskId = new HashSet<>();
     }
 
@@ -42,9 +43,13 @@ public class Epic extends Task {
         return "Epic{"
                 + "id=" + id
                 + ", type=" + type
+                + ", status" + status
                 + ", name='" + name
                 + ", description='" + description
                 + ", listSubTasksId=" + listSubTaskId
+                + ", duration='" + duration.toMinutes()
+                + ", startTime='" + startTime.format(formatter)
+                + ", endTime='" + getEndTime().format(formatter)
                 + '}';
     }
 }

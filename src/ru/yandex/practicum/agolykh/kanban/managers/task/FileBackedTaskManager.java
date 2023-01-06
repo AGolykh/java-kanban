@@ -11,26 +11,35 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileBackedTasksManager extends InMemoryTaskManager {
+public class FileBackedTaskManager extends InMemoryTaskManager {
     private final String dir = System.getProperty("user.dir") + "\\resources\\";
     private final String fileName = "Tasks.csv";
-    private final String path = dir + fileName;
+    private String path = dir + fileName;
+
+    public void setPath(String path) {
+        this.path = path;
+    }
 
     // Создание экземпляра класса с данными из файла
-    public static FileBackedTasksManager loadFromFile(File file) {
-        FileBackedTasksManager result = new FileBackedTasksManager();
+    public static FileBackedTaskManager loadFromFile(File file) {
+        FileBackedTaskManager result = new FileBackedTaskManager();
+        ArrayList<SubTask> tempSubTaskList = new ArrayList<>();
         try (FileReader reader = new FileReader(file, StandardCharsets.UTF_8);
              BufferedReader br = new BufferedReader(reader)) {
             while (br.ready()) {
                 String line = br.readLine();
                 if (!line.isEmpty()
-                        && !line.equals("id,type,status,name,description,epicId")) {
+                        && !line.equals("id,type,status,name,description,epicId,duration,dateTime,endTime")) {
                     String typeTask = line.split(",")[1];
                     switch (typeTask) {
                         case "TASK" -> result.addTask(Converter.taskFromString(line));
                         case "SUBTASK" -> {
                             SubTask subTask = Converter.subTaskFromString(line);
-                            result.subTaskList.put(subTask.getId(), subTask);
+                            if(result.epicList.containsKey(subTask.getEpicId())) {
+                                result.addSubTask(subTask);
+                            } else {
+                                tempSubTaskList.add(subTask);
+                            }
                         }
                         case "EPIC" -> result.addEpic(Converter.epicFromString(line));
                         default -> {
@@ -42,15 +51,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                                 } else if (result.subTaskList.containsKey(id)) {
                                     result.history.add(result.subTaskList.get(id));
                                 }
+                                result.save();
                             }
                         }
                     }
                 }
             }
-            for (SubTask subTask : result.subTaskList.values()) {
-                Epic epic = result.epicList.get(subTask.getEpicId());
-                epic.addSubTaskId(subTask.getId());
-                result.epicList.put(epic.getId(), epic);
+            for (SubTask subTask : tempSubTaskList) {
+                if(result.epicList.containsKey(subTask.getEpicId())) {
+                    Epic epic = result.epicList.get(subTask.getEpicId());
+                    epic.addSubTaskId(subTask.getId());
+                    result.epicList.put(epic.getId(), epic);
+                }
             }
             return result;
         } catch (IOException e) {
@@ -58,11 +70,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-
     // Сохранение в файл
-    private void save() {
+    public void save() {
         try (Writer fw = new FileWriter(path)) {
-            fw.write("id,type,status,name,description,epicId\n");
+            fw.write("id,type,status,name,description,epicId,duration,dateTime,endTime\n");
             for (Task value : taskList.values()) {
                 fw.write(fromTask(value));
             }

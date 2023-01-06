@@ -67,6 +67,12 @@ public interface TaskManager {
     // Проверка статуса эпика
     void checkStatus(int id);
 
+    // Расчет времени для эпика
+    void calculateTime(int id);
+
+    // Вывод списка приоритета
+    ArrayList<Task> getPrioritizedTasks();
+
     ArrayList<Task> getHistory();
 
     int countOfNodes();
