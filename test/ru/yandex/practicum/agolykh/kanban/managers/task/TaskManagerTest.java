@@ -1,6 +1,5 @@
 package ru.yandex.practicum.agolykh.kanban.managers.task;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.agolykh.kanban.tasks.Epic;
 import ru.yandex.practicum.agolykh.kanban.tasks.Status;
@@ -18,21 +17,12 @@ abstract class TaskManagerTest<T extends TaskManager> {
     static ArrayList<Epic> epicArray;
     static ArrayList<SubTask> subTaskArray;
 
-    public TaskManager getManager() {
-        return taskManager;
-    }
-
     public void setManager(TaskManager manager) {
-        this.taskManager = manager;
-    }
-
-    @BeforeEach
-    void beforeEach() {
-        taskManager = getManager();
+        taskManager = manager;
     }
 
     @Test
-    void getTaskList() {
+    void getTaskList_returnListWithThreeTasks_managerWithThreeTasks() {
         addTasksTest();
         assertEquals(3, taskManager.getTaskList().size());
         assertArrayEquals(taskArray.toArray(new Task[0]),
@@ -40,12 +30,12 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void getNullTaskList() {
-        assertEquals(0, taskManager.getTaskList().size());
+    void getNullTaskList_returnEmptyList_emptyManager() {
+        assertTrue(taskManager.getTaskList().isEmpty());
     }
 
     @Test
-    void getEpicList() {
+    void getEpicList_returnListWithThreeEpics_managerWithThreeEpics() {
         addEpicsTest();
         assertEquals(3, taskManager.getEpicList().size());
         assertArrayEquals(epicArray.toArray(new Epic[0]),
@@ -53,12 +43,12 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void getNullEpicList() {
-        assertEquals(0, taskManager.getEpicList().size());
+    void getNullEpicList_returnEmptyList_emptyManager() {
+        assertTrue(taskManager.getEpicList().isEmpty());
     }
 
     @Test
-    void getSubTaskList() {
+    void getSubTaskList_returnListWithThreeSubTasks_managerWithThreeSubTasks() {
         addEpicsTest();
         addSubTasksTest();
         assertEquals(6, taskManager.getSubTaskList().size());
@@ -67,7 +57,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void getSubTasksOfEpic() {
+    void getNullSubTaskList_returnEmptyList_emptyManager() {
+        assertTrue(taskManager.getSubTaskList().isEmpty());
+    }
+    @Test
+    void getSubTasksOfEpic_returnTwoSubTasksOfEpic_managerWithEpicsAndSubTasks() {
         addEpicsTest();
         addSubTasksTest();
         assertNotNull(taskManager.getEpic(4));
@@ -77,30 +71,30 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 " name='Подзадача 1," +
                 " description='Описание подзадачи 1," +
                 " epicId='4," +
-                " duration='0," +
-                " dateTime='01.01.2000 00:00," +
-                " endTime='01.01.2000 00:00}," +
+                " duration='null," +
+                " startTime='null," +
+                " endTime='null}," +
                 " SubTask{id=8," +
                 " type=SUBTASK," +
                 " status=NEW," +
                 " name='Подзадача 2," +
                 " description='Описание подзадачи 2," +
                 " epicId='4," +
-                " duration='0," +
-                " dateTime='01.01.2000 00:00," +
-                " endTime='01.01.2000 00:00}]",
+                " duration='null," +
+                " startTime='null," +
+                " endTime='null}]",
                 taskManager.getSubTasksOfEpic(4).toString());
         assertEquals("[7, 8]", taskManager.getEpic(4).getListSubTaskId().toString());
     }
 
     @Test
-    void getTask() {
+    void getTask_returnTasks_managerWithTasks() {
         addTasksTest();
         assertEquals(2, taskManager.getTask(2).getId());
     }
 
     @Test
-    void getTaskWithWrongId() {
+    void getTask_returnException_wrongId() {
         final NullPointerException exception = assertThrows(
                 NullPointerException.class,
                 () -> {
@@ -112,13 +106,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void getEpic() {
+    void getEpic_returnEpics_managerWithEpics() {
         addEpicsTest();
         assertEquals(4, taskManager.getEpic(4).getId());
     }
 
     @Test
-    void getEpicWithWrongId() {
+    void getEpic_returnException_wrongId() {
         final NullPointerException exception = assertThrows(
                 NullPointerException.class,
                 () -> {
@@ -130,14 +124,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void getSubTask() {
+    void getSubTask_returnSubTasks_managerWithEpicsAndSubTasks() {
         addEpicsTest();
         addSubTasksTest();
         assertEquals(8, taskManager.getSubTask(8).getId());
     }
 
     @Test
-    void getSubTaskWithWrongId() {
+    void getSub_returnException_wrongId() {
         final NullPointerException exception = assertThrows(
                 NullPointerException.class,
                 () -> {
@@ -150,21 +144,21 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void addTask() {
+    void addTask_returnListWithThreeTasks_emptyManager() {
         assertEquals(0, taskManager.getTaskList().size());
         addTasksTest();
         assertEquals(3, taskManager.getTaskList().size());
     }
 
     @Test
-    void addEpic() {
+    void addEpic_returnListWithThreeTasks_emptyManager() {
         assertEquals(0, taskManager.getEpicList().size());
         addEpicsTest();
         assertEquals(3, taskManager.getEpicList().size());
     }
 
     @Test
-    void addSubTask() {
+    void addSubTask_returnListWithThreeTasks_emptyManager() {
         assertEquals(0, taskManager.getSubTaskList().size());
         addEpicsTest();
         addSubTasksTest();
@@ -172,7 +166,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void checkSubTaskInEpic() {
+    void checkSubTaskInEpic_returnTwoIdSubTasksOfEpic_managerWithEpicsAndSubTasks() {
         addEpicsTest();
         assertEquals("[]", taskManager.getEpic(4).getListSubTaskId().toString());
         addSubTasksTest();
@@ -180,7 +174,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void checkEpicIdInSubTask() {
+    void checkEpicIdInSubTask_returnEpicIdOfFromSubTask_managerWithEpicsAndSubTasks() {
         addSubTasksTest();
         assertEquals(0, taskManager.getSubTaskList().size());
         addEpicsTest();
@@ -189,7 +183,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void updateTask() {
+    void updateTask_returnUpdatedTask_managerWithTasks() {
         addTasksTest();
         Task newTask = new Task(Status.IN_PROGRESS,
                 "Какая-то задача",
@@ -201,7 +195,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void updateEpic() {
+    void updateEpic_returnUpdatedEpic_managerWithEpics() {
         addEpicsTest();
         Epic newEpic = new Epic("Какая-то задача",
                 "Какое-то описание");
@@ -212,7 +206,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void updateSubTask() {
+    void updateSubTask_returnUpdatedSubTask_managerWithEpicsAndSubTasks() {
         addEpicsTest();
         addSubTasksTest();
         SubTask newSubTask = new SubTask(Status.IN_PROGRESS,
@@ -226,7 +220,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void deleteTask() {
+    void deleteTask_returnExceptionAfterGetTask_managerWithTasks() {
         addTasksTest();
         assertEquals(2, taskManager.getTask(2).getId());
         taskManager.deleteTask(2);
@@ -238,7 +232,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void deleteTaskWithWrongId() {
+    void deleteTask_returnException_wrongId() {
         final NullPointerException exception = assertThrows(
                 NullPointerException.class,
                 () -> {
@@ -250,7 +244,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void deleteEpicWithRemoveSubTasks() {
+    void deleteEpicWithRemoveSubTasks_returnExceptionAfterGetEpicAndSubTask_managerWithEpicsAndSubTasks() {
         addEpicsTest();
         addSubTasksTest();
         assertEquals(4, taskManager.getEpic(4).getId());
@@ -271,7 +265,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void deleteEpicWithWrongId() {
+    void deleteEpic_returnException_wrongId() {
         final NullPointerException exception = assertThrows(
                 NullPointerException.class,
                 () -> {
@@ -283,7 +277,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void deleteSubTask() {
+    void deleteSubTask_returnExceptionAfterGetTask_managerWithEpicsAndSubTasks() {
         addEpicsTest();
         addSubTasksTest();
         assertEquals(12, taskManager.getSubTask(12).getId());
@@ -300,7 +294,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void deleteSubTaskWithWrongId() {
+    void deleteSubTask_returnException_wrongId() {
         final NullPointerException exception = assertThrows(
                 NullPointerException.class,
                 () -> {
@@ -313,62 +307,37 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void clearTaskList() {
+    void clearTaskList_returnEmptyTaskList_managerWithTasks() {
         addTasksTest();
-        assertNotEquals(0, taskManager.getTaskList().size());
+        assertFalse(taskManager.getTaskList().isEmpty());
         taskManager.clearTaskList();
-        assertEquals(0, taskManager.getTaskList().size());
+        assertTrue(taskManager.getTaskList().isEmpty());
     }
 
     @Test
-    void clearEpicList() {
+    void clearEpicList_returnEmptyEpicList_managerWithEpics() {
         addEpicsTest();
-        assertNotEquals(0, taskManager.getEpicList().size());
+        assertFalse(taskManager.getEpicList().isEmpty());
         taskManager.clearEpicList();
-        assertEquals(0, taskManager.getEpicList().size());
+        assertTrue(taskManager.getEpicList().isEmpty());
     }
 
     @Test
-    void clearSubTaskList() {
+    void clearSubTaskList_returnEmptySubTaskList_managerWithEpicsAndSubTasks() {
         addEpicsTest();
         addSubTasksTest();
-        assertNotEquals(0, taskManager.getSubTaskList().size());
+        assertFalse(taskManager.getSubTaskList().isEmpty());
         taskManager.clearSubTaskList();
-        assertEquals(0, taskManager.getSubTaskList().size());
+        assertTrue(taskManager.getSubTaskList().isEmpty());
     }
 
     @Test
-    void clearSubTaskListAfterClearEpicList() {
+    void clearSubTaskListAfterClearEpicList_returnEmptySubTaskList_managerWithEpicsAndSubTasks() {
         addEpicsTest();
         addSubTasksTest();
+        assertFalse(taskManager.getSubTaskList().isEmpty());
         taskManager.clearEpicList();
-        assertEquals(0, taskManager.getSubTaskList().size());
-    }
-
-    @Test
-    void checkStatusChangeInProgressAnDone() {
-        addEpicsTest();
-        addSubTasksTest();
-        Epic epic = taskManager.getEpic(4);
-        assertEquals(Status.NEW, epic.getStatus());
-        taskManager.updateSubTask(7, new SubTask(Status.IN_PROGRESS, null, null, 4));
-        assertEquals(Status.IN_PROGRESS, epic.getStatus());
-        taskManager.updateSubTask(7, new SubTask(Status.DONE, null, null, 4));
-        assertEquals(Status.IN_PROGRESS, epic.getStatus());
-        taskManager.updateSubTask(8, new SubTask(Status.DONE, null, null, 4));
-        assertEquals(Status.DONE, epic.getStatus());
-
-    }
-
-    @Test
-    void getHistoryAndCountOfNodes() {
-        addTasksTest();
-        taskManager.getTask(1);
-        taskManager.getTask(2);
-        taskManager.getTask(3);
-        taskManager.getTask(2);
-        assertEquals(3, taskManager.getHistory().size());
-        assertEquals(3, taskManager.countOfNodes());
+        assertTrue(taskManager.getSubTaskList().isEmpty());
     }
 
     void addTasksTest() {

@@ -24,12 +24,12 @@ class EpicTest {
     }
 
     @Test
-    void statusNewFromEpicWithSubTaskListIsEmpty() {
+    void calculateStatus_returnNew_emptySubTasks() {
         assertEquals(Status.NEW, testTaskManager.getEpic(1).getStatus());
     }
 
     @Test
-    void statusNewFromEpicWithSubTaskListWithNew() {
+    void calculateStatus_returnNew_newSubTasks() {
         testTaskManager.addSubTask(
                 new SubTask("Новая подзадача 1",
                         "Описание новой подзадачи 1",
@@ -42,7 +42,7 @@ class EpicTest {
     }
 
     @Test
-    void statusNewFromEpicWithSubTaskListWithDone() {
+    void calculateStatus_returnDone_DoneSubTasks() {
         testTaskManager.addSubTask(
                 new SubTask(Status.DONE,
                         "Выполненная подзадача 1",
@@ -57,7 +57,7 @@ class EpicTest {
     }
 
     @Test
-    void statusNewFromEpicWithSubTaskListWithNewAndDone() {
+    void calculateStatus_returnInProgress_NewAndDoneSubTasks() {
         testTaskManager.addSubTask(
                 new SubTask(Status.NEW,
                         "Новая подзадача 1",
@@ -72,7 +72,7 @@ class EpicTest {
     }
 
     @Test
-    void statusNewFromEpicWithSubTaskListWithInProgress() {
+    void calculateStatus_returnInProgress_InProgressSubTasks() {
         testTaskManager.addSubTask(
                 new SubTask(Status.IN_PROGRESS,
                         "Выполненная подзадача 1",
@@ -85,5 +85,4 @@ class EpicTest {
                         1));
         assertEquals(Status.IN_PROGRESS, testTaskManager.getEpic(1).getStatus());
     }
-
 }

@@ -125,6 +125,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         save();
     }
 
+
     @Override
     public void addEpic(Epic epic) {
         super.addEpic(epic);
@@ -191,9 +192,5 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         save();
     }
 
-    @Override
-    public void checkStatus(int id) {
-        super.checkStatus(id);
-        save();
-    }
+
 }

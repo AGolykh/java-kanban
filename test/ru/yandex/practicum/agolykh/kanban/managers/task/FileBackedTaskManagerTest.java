@@ -3,6 +3,10 @@ package ru.yandex.practicum.agolykh.kanban.managers.task;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.agolykh.kanban.exceptions.ManagerSaveException;
 import ru.yandex.practicum.agolykh.kanban.managers.Managers;
+import ru.yandex.practicum.agolykh.kanban.tasks.Epic;
+import ru.yandex.practicum.agolykh.kanban.tasks.Status;
+import ru.yandex.practicum.agolykh.kanban.tasks.SubTask;
+import ru.yandex.practicum.agolykh.kanban.tasks.Task;
 
 import java.io.File;
 
@@ -15,7 +19,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
     }
 
     @Test
-    void importFromFile() {
+    void importFromFile_returnRightManager_normalFile() {
         final String dir = System.getProperty("user.dir") + "\\resources\\";
         final String fileName = "Normal.csv";
         final String path = dir + fileName;
@@ -32,7 +36,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
     }
 
     @Test
-    void importFromFileWitOutSubTasks() {
+    void importFromFile_returnManagerWitOutSubTasks_withOutSubTasksFile() {
         final String dir = System.getProperty("user.dir") + "\\resources\\";
         final String fileName = "WithOutSubTasks.csv";
         final String path = dir + fileName;
@@ -46,7 +50,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
     }
 
     @Test
-    void importFromFileWitOutHistory() {
+    void importFromFile_returnManagerWitOutHistory_withOutHistoryFile() {
         final String dir = System.getProperty("user.dir") + "\\resources\\";
         final String fileName = "WithOutHistory.csv";
         final String path = dir + fileName;
@@ -59,7 +63,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
     }
 
     @Test
-    void importFromEmptyFile() {
+    void importFromFile_returnEmptyManager_emptyFile() {
         final String dir = System.getProperty("user.dir") + "\\resources\\";
         final String fileName = "Empty.csv";
         final String path = dir + fileName;
@@ -72,7 +76,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
     }
 
     @Test
-    void importFromNullFile() {
+    void importFromFile_returnManagerSaveException_nullFile() {
         final ManagerSaveException exception = assertThrows(
                 ManagerSaveException.class,
                 () -> {
@@ -87,9 +91,9 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
     }
 
     @Test
-    void checkSaveEmptyManager() {
+    void checkSaveEmptyManager_returnEmptyManager_emptyData() {
         final String dir = System.getProperty("user.dir") + "\\resources\\";
-        final String fileName = "fileForEmptyFileBackedManager.csv";
+        final String fileName = "FileForEmptyFileBackedManager.csv";
         final String path = dir + fileName;
         FileBackedTaskManager toFile = new FileBackedTaskManager();
         toFile.setPath(path);
@@ -103,6 +107,30 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
         assertEquals(0, fromFile.getEpicList().size());
         assertEquals(0, fromFile.getSubTaskList().size());
         assertEquals(0, fromFile.getHistory().size());
+    }
+
+    @Test
+    void checkSaveManager_returnManagerWithThreeTasks_managerWithThreeTasks() {
+        final String dir = System.getProperty("user.dir") + "\\resources\\";
+        final String fileName = "FileForSavingFileBackedManager.csv";
+        final String path = dir + fileName;
+        FileBackedTaskManager toFile = new FileBackedTaskManager();
+        toFile.setPath(path);
+
+        Task task = new Task(Status.DONE, "Задача 1", "Описание задачи 1");
+        Epic epic = new Epic(Status.DONE, "Родительская задача 1", "Описание родительской задачи 1");
+        SubTask subTask = new SubTask(Status.IN_PROGRESS, "Подзадача 1", "Описание подзадачи 1", 2);
+        toFile.addTask(task);
+        toFile.addEpic(epic);
+        toFile.addSubTask(subTask);
+        toFile.getTask(1);
+        toFile.getSubTask(3);
+        toFile.save();
+        FileBackedTaskManager fromFile = FileBackedTaskManager.loadFromFile(new File(path));
+        assertEquals(2, fromFile.getHistory().size());
+        assertEquals(task, fromFile.getTask(1));
+        assertEquals(epic, fromFile.getEpic(2));
+        assertEquals(1, fromFile.getSubTaskList().size());
 
     }
 }

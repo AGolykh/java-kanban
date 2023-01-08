@@ -9,10 +9,7 @@ import ru.yandex.practicum.agolykh.kanban.tasks.Task;
 import ru.yandex.practicum.agolykh.kanban.tasks.Status;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.Set;
 
 public class Main {
     static TaskManager taskManager;
@@ -27,10 +24,11 @@ public class Main {
         taskManager.addEpic(new Epic("Эпик 1", "Описание эпика 1"));
         taskManager.addSubTask(new SubTask("Подзадача 1", "Описание подзадачи 1", 3, 45, "14.01.2023 20:30"));
         taskManager.addSubTask(new SubTask("Подзадача 2", "Описание подзадачи 2", 3, 45, "14.01.2023 19:30"));
+        taskManager.addSubTask(new SubTask("Подзадача 28", "Описание подзадачи 28", 3, 45, "14.01.2023 19:30"));
         taskManager.addEpic(new Epic("Эпик 2", "Описание эпика 2"));
         taskManager.addSubTask(new SubTask("Подзадача 3", "Описание подзадачи 3", 6, 45, "14.01.2023 18:30"));
-        taskManager.addSubTask(new SubTask("Подзадача 4", "Описание подзадачи 4", 6, 45, "14.01.2023 17:30"));
-        taskManager.addTask(new Task("Задача 3", "Описание задачи 3", 45, "14.01.2023 14:30"));
+        taskManager.addSubTask(new SubTask("Подзадача 4", "Описание подзадачи 4", 6));
+        taskManager.addTask(new Task("Задача 3", "Описание задачи 3"));
         taskManager.addEpic(new Epic("Эпик 3", "Описание эпика 3"));
         taskManager.addSubTask(new SubTask("Подзадача 5", "Описание подзадачи 5", 10, 45, "14.01.2023 16:30"));
         taskManager.addSubTask(new SubTask("Подзадача 6", "Описание подзадачи 6", 10, 45, "14.01.2023 13:30"));
@@ -117,10 +115,7 @@ public class Main {
 
         taskManager.deleteEpic(10);
         System.out.println(taskManager.getHistory());
-        System.out.println(taskManager.countOfNodes());
-
-        ArrayList<Task> taskers = taskManager.getPrioritizedTasks();
-        System.out.println(taskManager.getPrioritizedTasks());
+        Set<Task> setTask = taskManager.getPrioritizedTasks();
 
         final String dir = System.getProperty("user.dir") + "\\resources\\";
         final String fileName = "Tasks.csv"; // Тут можно заменить на Tasks.csv
@@ -138,6 +133,13 @@ public class Main {
         } catch (ManagerSaveException e) {
             System.out.println(e.getMessage());
         }
+
+
+        Task taskers = new Task("Новая", "Jgbcfybt");
+        System.out.println(taskers);
+
+        Task taskers2 = new Task("Задача 1", "Описание задачи 1", 45, "14.01.2023 08:30");
+        System.out.println(taskers2);
         long time = System.currentTimeMillis() - startTime;
         System.out.println(time);
     }

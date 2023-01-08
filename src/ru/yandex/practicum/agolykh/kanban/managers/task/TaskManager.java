@@ -5,6 +5,7 @@ import ru.yandex.practicum.agolykh.kanban.tasks.SubTask;
 import ru.yandex.practicum.agolykh.kanban.tasks.Task;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 public interface TaskManager {
     // Получить список задач
@@ -64,17 +65,10 @@ public interface TaskManager {
     // Очистить список подзадач
     void clearSubTaskList();
 
-    // Проверка статуса эпика
-    void checkStatus(int id);
+    // Получение множества задач по приоритету
+    Set<Task> getPrioritizedTasks();
 
-    // Расчет времени для эпика
-    void calculateTime(int id);
-
-    // Вывод списка приоритета
-    ArrayList<Task> getPrioritizedTasks();
-
+    // Получение истории
     ArrayList<Task> getHistory();
-
-    int countOfNodes();
 }
 

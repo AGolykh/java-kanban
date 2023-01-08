@@ -13,12 +13,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         nodesList = new CustomLinkedList<>();
     }
 
-    // Получить количество элементов
-    @Override
-    public int countOfNodes() {
-        return nodesList.getSize();
-    }
-
     // Добавление элемента в историю
     @Override
     public void add(Task task) {
@@ -60,7 +54,7 @@ class CustomLinkedList<T extends Task> {
         }
     }
 
-    int getSize() {
+    int size() {
         return size;
     }
 

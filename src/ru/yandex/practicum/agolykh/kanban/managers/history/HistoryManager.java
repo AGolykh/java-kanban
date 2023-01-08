@@ -5,9 +5,6 @@ import ru.yandex.practicum.agolykh.kanban.tasks.Task;
 import java.util.ArrayList;
 
 public interface HistoryManager {
-
-    int countOfNodes();
-
     void add(Task task);
 
     void remove(int id);

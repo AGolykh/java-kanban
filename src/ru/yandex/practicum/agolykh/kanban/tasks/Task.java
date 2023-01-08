@@ -3,6 +3,7 @@ package ru.yandex.practicum.agolykh.kanban.tasks;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 public class Task {
     protected Integer id;
@@ -20,12 +21,8 @@ public class Task {
         this.status = Status.NEW;
         this.name = name;
         this.description = description;
-        this.duration = Duration.ofMinutes(0);
-        this.startTime = LocalDateTime.of(8888,
-                                        8,
-                                        8,
-                                        8,
-                                        8);
+        this.duration = null;
+        this.startTime = null;
     }
 
     public Task(String name, String description, int duration, String dateTime) {
@@ -42,12 +39,8 @@ public class Task {
         this.status = status;
         this.name = name;
         this.description = description;
-        this.duration = Duration.ofMinutes(0);
-        this.startTime = LocalDateTime.of(8888,
-                8,
-                8,
-                8,
-                8);
+        this.duration = null;
+        this.startTime = null;
     }
 
     public Task(Status status, String name, String description, int duration, String dateTime) {
@@ -104,6 +97,9 @@ public class Task {
     }
 
     public LocalDateTime getEndTime() {
+        if ((this.startTime == null) || (this.duration == null)) {
+            return null;
+        }
         return startTime.plusMinutes(duration.toMinutes());
     }
 
@@ -121,15 +117,22 @@ public class Task {
 
     @Override
     public String toString() {
+        Long optionalDuration = Optional.ofNullable(duration)
+                .map(Duration::toMinutes).orElse(null);
+        String optionalStartTime = Optional.ofNullable(startTime)
+                .map((time) -> time.format(formatter)).orElse(null);
+        String optionalEndTime = Optional.ofNullable(getEndTime())
+                .map((time) -> time.format(formatter)).orElse(null);
+
         return "Task{"
                 + "id=" + id
                 + ", type=" + type
                 + ", status=" + status
                 + ", name='" + name
                 + ", description='" + description
-                + ", duration='" + duration.toMinutes()
-                + ", startTime='" + startTime.format(formatter)
-                + ", endTime='" + getEndTime().format(formatter)
+                + ", duration='" + optionalDuration
+                + ", startTime='" + optionalStartTime
+                + ", endTime='" + optionalEndTime
                 + '}';
     }
 

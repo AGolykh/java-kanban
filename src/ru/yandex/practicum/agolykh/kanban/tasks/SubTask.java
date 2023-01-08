@@ -1,5 +1,8 @@
 package ru.yandex.practicum.agolykh.kanban.tasks;
 
+import java.time.Duration;
+import java.util.Optional;
+
 public class SubTask extends Task {
     protected final int epicId;
 
@@ -33,6 +36,13 @@ public class SubTask extends Task {
     }
 
     public String toString() {
+        Long optionalDuration = Optional.ofNullable(duration)
+                .map(Duration::toMinutes).orElse(null);
+        String optionalStartTime = Optional.ofNullable(startTime)
+                .map((time) -> time.format(formatter)).orElse(null);
+        String optionalEndTime = Optional.ofNullable(getEndTime())
+                .map((time) -> time.format(formatter)).orElse(null);
+
         return "SubTask{"
                 + "id=" + id
                 + ", type=" + type
@@ -40,9 +50,9 @@ public class SubTask extends Task {
                 + ", name='" + name
                 + ", description='" + description
                 + ", epicId='" + epicId
-                + ", duration='" + duration.toMinutes()
-                + ", startTime='" + startTime.format(formatter)
-                + ", endTime='" + getEndTime().format(formatter)
+                + ", duration='" + optionalDuration
+                + ", startTime='" + optionalStartTime
+                + ", endTime='" + optionalEndTime
                 + '}';
     }
 }

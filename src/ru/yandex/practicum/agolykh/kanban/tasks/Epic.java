@@ -1,6 +1,8 @@
 package ru.yandex.practicum.agolykh.kanban.tasks;
 
+import java.time.Duration;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public class Epic extends Task {
@@ -40,16 +42,23 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
+        Long optionalDuration = Optional.ofNullable(duration)
+                .map(Duration::toMinutes).orElse(null);
+        String optionalStartTime = Optional.ofNullable(startTime)
+                .map((time) -> time.format(formatter)).orElse(null);
+        String optionalEndTime = Optional.ofNullable(getEndTime())
+                .map((time) -> time.format(formatter)).orElse(null);
+
         return "Epic{"
                 + "id=" + id
                 + ", type=" + type
-                + ", status" + status
+                + ", status=" + status
                 + ", name='" + name
                 + ", description='" + description
                 + ", listSubTasksId=" + listSubTaskId
-                + ", duration='" + duration.toMinutes()
-                + ", startTime='" + startTime.format(formatter)
-                + ", endTime='" + getEndTime().format(formatter)
+                + ", duration='" + optionalDuration
+                + ", startTime='" + optionalStartTime
+                + ", endTime='" + optionalEndTime
                 + '}';
     }
 }

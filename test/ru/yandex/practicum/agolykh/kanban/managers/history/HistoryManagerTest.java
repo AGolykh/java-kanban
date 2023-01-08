@@ -1,6 +1,5 @@
 package ru.yandex.practicum.agolykh.kanban.managers.history;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.agolykh.kanban.managers.Managers;
@@ -24,85 +23,67 @@ class HistoryManagerTest {
             "Задача 3",
             "Описание задачи 3");
 
-    @BeforeAll
-    static void beforeAll() {
+    @BeforeEach
+    void beforeEach() {
         testHistoryManager = Managers.getDefaultHistory();
         task1.setId(1);
         task2.setId(2);
         task3.setId(3);
     }
 
-    @BeforeEach
-    void beforeEach() {
-        for (Task task : testHistoryManager.getHistory()) {
-            testHistoryManager.remove(task.getId());
-        }
+    @Test
+    void getHistory_returnEmpty_emptyHistory(){
+        assertTrue(testHistoryManager.getHistory().isEmpty());
     }
 
     @Test
-    void getHistoryFromEmptyHistoryManager(){
-        assertEquals(0, testHistoryManager.getHistory().size());
-        assertEquals(0, testHistoryManager.countOfNodes());
-    }
-
-    @Test
-    void addHistoryToEmptyHistoryManager(){
+    void addTaskInHistory_returnTask_emptyHistory(){
         testHistoryManager.add(task1);
-        assertNotNull(testHistoryManager.getHistory());
         assertEquals(1, testHistoryManager.getHistory().size());
-        assertEquals(1, testHistoryManager.countOfNodes());
-        assertArrayEquals(new Task[]{task1},
-                testHistoryManager.getHistory().toArray(new Task[0]));
+        assertEquals(task1, testHistoryManager.getHistory().get(0));
     }
 
     @Test
-    void addCopyHistoryToHistoryManager(){
+    void addCopyInHistory_returnThreeTasks_HistoryWithThreeTasks(){
         testHistoryManager.add(task1);
         testHistoryManager.add(task2);
         testHistoryManager.add(task3);
         testHistoryManager.add(task1); // копия
-        assertNotNull(testHistoryManager.getHistory());
         assertEquals(3, testHistoryManager.getHistory().size());
-        assertEquals(3, testHistoryManager.countOfNodes());
         assertArrayEquals(new Task[]{task1, task3, task2},
                 testHistoryManager.getHistory().toArray(new Task[0]));
     }
 
     @Test
-    void removeFirstFromHistoryManager(){
+    void removeFirstTask_returnTasksExceptFirst_HistoryWithThreeTasks(){
         testHistoryManager.add(task1);
         testHistoryManager.add(task2);
         testHistoryManager.add(task3);
         testHistoryManager.remove(task3.getId());
-        assertNotNull(testHistoryManager.getHistory());
         assertEquals(2, testHistoryManager.getHistory().size());
-        assertEquals(2, testHistoryManager.countOfNodes());
         assertArrayEquals(new Task[]{task2, task1},
                 testHistoryManager.getHistory().toArray(new Task[0]));
     }
 
     @Test
-    void removeMidFromHistoryManager(){
+    void removeMidTask_returnTasksExceptMid_HistoryWithThreeTasks(){
         testHistoryManager.add(task1);
         testHistoryManager.add(task2);
         testHistoryManager.add(task3);
         testHistoryManager.remove(task2.getId());
         assertNotNull(testHistoryManager.getHistory());
         assertEquals(2, testHistoryManager.getHistory().size());
-        assertEquals(2, testHistoryManager.countOfNodes());
         assertArrayEquals(new Task[]{task3, task1},
                 testHistoryManager.getHistory().toArray(new Task[0]));
     }
 
     @Test
-    void removeLastFromHistoryManager(){
+    void removeLastTask_returnTasksExceptLast_HistoryWithThreeTasks(){
         testHistoryManager.add(task1);
         testHistoryManager.add(task2);
         testHistoryManager.add(task3);
         testHistoryManager.remove(task1.getId());
-        assertNotNull(testHistoryManager.getHistory());
         assertEquals(2, testHistoryManager.getHistory().size());
-        assertEquals(2, testHistoryManager.countOfNodes());
         assertArrayEquals(new Task[]{task3, task2},
                 testHistoryManager.getHistory().toArray(new Task[0]));
     }
