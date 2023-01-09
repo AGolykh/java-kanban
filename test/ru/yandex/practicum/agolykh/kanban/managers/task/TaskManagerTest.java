@@ -65,25 +65,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
         addEpicsTest();
         addSubTasksTest();
         assertNotNull(taskManager.getEpic(4));
-        assertEquals("[SubTask{id=7," +
-                " type=SUBTASK," +
-                " status=NEW," +
-                " name='Подзадача 1," +
-                " description='Описание подзадачи 1," +
-                " epicId='4," +
-                " duration='null," +
-                " startTime='null," +
-                " endTime='null}," +
-                " SubTask{id=8," +
-                " type=SUBTASK," +
-                " status=NEW," +
-                " name='Подзадача 2," +
-                " description='Описание подзадачи 2," +
-                " epicId='4," +
-                " duration='null," +
-                " startTime='null," +
-                " endTime='null}]",
-                taskManager.getSubTasksOfEpic(4).toString());
+        assertArrayEquals(new SubTask[]{taskManager.getSubTask(7), taskManager.getSubTask(8)},
+                taskManager.getSubTasksOfEpic(4).toArray());
         assertEquals("[7, 8]", taskManager.getEpic(4).getListSubTaskId().toString());
     }
 
@@ -175,8 +158,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void checkEpicIdInSubTask_returnEpicIdOfFromSubTask_managerWithEpicsAndSubTasks() {
+        addEpicsTest();
         addSubTasksTest();
-        assertEquals(0, taskManager.getSubTaskList().size());
+        assertEquals(6, taskManager.getSubTaskList().size());
         addEpicsTest();
         addSubTasksTest();
         assertEquals(4, taskManager.getSubTask(7).getEpicId());

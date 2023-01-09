@@ -8,9 +8,7 @@ import ru.yandex.practicum.agolykh.kanban.managers.task.TaskManager;
 
 public class Managers {
 
-    private Managers() {
-
-    }
+    private Managers() {}
 
     public static TaskManager getDefault() {
         return new InMemoryTaskManager();

@@ -91,7 +91,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
     }
 
     @Test
-    void checkSaveEmptyManager_returnEmptyManager_emptyData() {
+    void saveEmptyManager_returnEmptyManager_emptyData() {
         final String dir = System.getProperty("user.dir") + "\\resources\\";
         final String fileName = "FileForEmptyFileBackedManager.csv";
         final String path = dir + fileName;

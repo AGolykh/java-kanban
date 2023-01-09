@@ -15,9 +15,8 @@ public class Epic extends Task {
     }
 
     public Epic(Status status, String name, String description) {
-        super(status, name, description);
-        this.type = TaskTypes.EPIC;
-        this.listSubTaskId = new HashSet<>();
+        this(name, description);
+        this.status = status;
     }
 
     // Получение списка подзадач

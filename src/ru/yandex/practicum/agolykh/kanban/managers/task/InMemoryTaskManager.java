@@ -124,7 +124,7 @@ public class InMemoryTaskManager implements TaskManager {
             calculateEpic(epicId);
             System.out.println("Подзадача " + id + " добавлена в родительскую задачу " + epicId + '.');
         } else {
-            System.out.println("Родительская задача " + epicId + " не обнаружена.");
+            throw new NullPointerException("Родительская задача " + epicId + " не обнаружена.");
         }
 
     }
@@ -132,115 +132,34 @@ public class InMemoryTaskManager implements TaskManager {
     // Обновить задачу
     public void updateTask(int id, Task newTask) {
         if (taskList.containsKey(id)) {
-            Task task = taskList.get(id);
-            boolean changeFlag = false;
-
-            if ((newTask.getStatus() != null)
-                    && !newTask.getStatus().equals(task.getStatus())) {
-                task.setStatus(newTask.getStatus());
-                changeFlag = true;
-            }
-
-            if ((newTask.getName() != null)
-                    && !newTask.getName().equals(task.getName())) {
-                task.setName(newTask.getName());
-                changeFlag = true;
-            }
-
-            if ((newTask.getDescription() != null)
-                    && !newTask.getDescription().equals(task.getDescription())) {
-                task.setDescription(newTask.getDescription());
-                changeFlag = true;
-            }
-
-            if((newTask.getDuration() != null)
-                    && !newTask.getDuration().equals(task.getDuration())) {
-                task.setDuration(newTask.getDuration());
-            }
-
-            if((newTask.getStartTime() != null)
-                    && !newTask.getStartTime().equals(task.getStartTime())) {
-                task.setStartTime(newTask.getStartTime());
-            }
-
-            if (changeFlag) {
-                taskList.put(id, task);
-                System.out.println("Задача " + id + " обновлена.");
-            }
+            newTask.setId(id);
+            taskList.put(id, newTask);
+            System.out.println("Задача " + id + " обновлена.");
         } else {
-            System.out.println("Задача " + id + " не найдена.");
+            throw new NullPointerException("Задача " + id + " не найдена.");
         }
     }
 
     // Обновить родительскую задачу
     public void updateEpic(int id, Epic newEpic) {
         if (epicList.containsKey(id)) {
-            Epic epic = epicList.get(id);
-            boolean changeFlag = false;
-
-            if ((newEpic.getName() != null)
-                    && !newEpic.getName().equals(epic.getName())) {
-                epic.setName(newEpic.getName());
-                changeFlag = true;
-            }
-
-            if ((newEpic.getDescription() != null)
-                    && !newEpic.getDescription().equals(epic.getDescription())) {
-                epic.setDescription(newEpic.getDescription());
-                changeFlag = true;
-            }
-
-            if (changeFlag) {
-                epicList.put(id, epic);
-                System.out.println("Родительская задача " + id + " обновлена.");
-            }
+            newEpic.setId(id);
+            epicList.put(id, newEpic);
+            System.out.println("Родительская задача " + id + " обновлена.");
         } else {
-            System.out.println("Родительская задача " + id + " не найдена.");
+            throw new NullPointerException("Родительская задача " + id + " не найдена.");
         }
     }
 
     // Обновить подзадачу
     public void updateSubTask(int id, SubTask newSubTask) {
         if (subTaskList.containsKey(id)) {
-            SubTask subTask = subTaskList.get(id);
-            int epicId = subTask.getEpicId();
-            boolean changeFlag = false;
-
-            if ((newSubTask.getStatus() != null)
-                    && !newSubTask.getStatus().equals(subTask.getStatus())) {
-                subTask.setStatus(newSubTask.getStatus());
-                changeFlag = true;
-            }
-
-            if ((newSubTask.getName() != null)
-                    && !newSubTask.getName().equals(subTask.getName())) {
-                subTask.setName(newSubTask.getName());
-                changeFlag = true;
-            }
-
-            if ((newSubTask.getDescription() != null)
-                    && !newSubTask.getDescription().equals(subTask.getDescription())) {
-                subTask.setDescription(newSubTask.getDescription());
-                changeFlag = true;
-            }
-
-            if((newSubTask.getDuration() != null)
-                    && !newSubTask.getDuration().equals(subTask.getDuration())) {
-                subTask.setDuration(newSubTask.getDuration());
-            }
-
-            if((newSubTask.getStartTime() != null)
-                    && !newSubTask.getStartTime().equals(subTask.getStartTime())) {
-                subTask.setStartTime(newSubTask.getStartTime());
-            }
-
-            if (changeFlag) {
-                subTaskList.put(id, subTask);
-                System.out.println("Подзадача " + id + " обновлена.");
-                calculateEpic(epicId);
-            }
+            newSubTask.setId(id);
+            subTaskList.put(id, newSubTask);
+            System.out.println("Подзадача " + id + " обновлена.");
+            calculateEpic(newSubTask.getEpicId());
         } else {
-            System.out.println("Подзадача " + id + " не найдена.");
+            throw new NullPointerException("Подзадача " + id + " не найдена.");
         }
     }
 
@@ -317,9 +236,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Расчет статуса и времени эпика
     private void calculateEpic(int id) {
+        checkStatus(id);
+        calculateTime(id);
+    }
 
-
-        TreeSet<SubTask> mapOfSubTask = new TreeSet<>(Comparator.comparing(Task::getStartTime));
+    // Проверка статуса эпика
+    private void checkStatus(int id) {
         if (epicList.containsKey(id)) {
             Set<Status> statusSet = new HashSet<>();
             Epic epic = epicList.get(id);
@@ -327,9 +249,6 @@ public class InMemoryTaskManager implements TaskManager {
             for (Integer idSubTask : epic.getListSubTaskId()) {
                 SubTask subTask = subTaskList.get(idSubTask);
                 statusSet.add(subTask.getStatus());
-                if (subTaskList.get(idSubTask).getStartTime() != null) {
-                    mapOfSubTask.add(subTaskList.get(idSubTask));
-                }
             }
 
             if ((statusSet.contains(Status.NEW)
@@ -343,21 +262,34 @@ public class InMemoryTaskManager implements TaskManager {
                 epic.setStatus(Status.IN_PROGRESS);
             }
             epicList.put(id, epic);
+            if (!oldStatus.equals(epic.getStatus())) {
+                System.out.println("Статус родительской задачи " + id + " обновлен.");
+            }
+        }
+    }
 
+    // Расчет времени для эпика
+    private void calculateTime(int id) {
+        TreeSet<SubTask> mapOfSubTask = new TreeSet<>(Comparator.comparing(Task::getStartTime));
+        if (epicList.containsKey(id)) {
+            Epic epic = epicList.get(id);
+            for (Integer idOfSubTask : epicList.get(id).getListSubTaskId()) {
+                if (subTaskList.get(idOfSubTask).getStartTime() != null) {
+                    mapOfSubTask.add(subTaskList.get(idOfSubTask));
+                }
+            }
             if(!mapOfSubTask.isEmpty()) {
                 epic.setStartTime(mapOfSubTask.first().getStartTime());
                 epic.setDuration(Duration.between(epic.getStartTime(),
                         mapOfSubTask.last().getEndTime()));
             }
-            if (!oldStatus.equals(epic.getStatus())) {
-                System.out.println("Родительская задача " + id + " обновлена.");
-            }
         }
     }
 
+    // Проверка свободного времени
     private boolean validateTime(Task task) {
         for (Task taskFromList : getPrioritizedTasks()) {
-            if((taskFromList.getStartTime() != null) && (task.getStartTime() != null)) {
+            if ((taskFromList.getStartTime() != null) && (task.getStartTime() != null)) {
                 boolean startTimeValid = task.getStartTime().isBefore(taskFromList.getStartTime())
                         && task.getEndTime().isBefore(taskFromList.getStartTime());
                 boolean endTimeValid = task.getStartTime().isAfter(taskFromList.getEndTime())
@@ -373,22 +305,21 @@ public class InMemoryTaskManager implements TaskManager {
     // Вывод списка приоритета
     @Override
     public Set<Task> getPrioritizedTasks() {
-        Comparator<Task> comparatorStartTime =
-                (e1, e2) -> Comparator.<LocalDateTime>nullsLast(Comparator.naturalOrder())
-                        .compare(e1.getStartTime(), e2.getStartTime());
+        Comparator<Task> comparatorStartTime = (e1, e2) -> Comparator
+                .<LocalDateTime>nullsLast(Comparator.naturalOrder())
+                .compare(e1.getStartTime(), e2.getStartTime());
 
-        Comparator<Task> comparatorId =
-                (e1, e2) -> Comparator.<Integer>nullsLast(Comparator.naturalOrder())
-                        .compare(e1.getId(), e2.getId());
+        Comparator<Task> comparatorId = (e1, e2) -> Comparator
+                .<Integer>nullsLast(Comparator.naturalOrder())
+                .compare(e1.getId(), e2.getId());
 
-        Comparator<Task> generalComparator =
-                (e1, e2) -> {
-                    if (e1.getStartTime() == null || e2.getStartTime() == null) {
-                        return comparatorId.compare(e1, e2);
-                    } else {
-                        return comparatorStartTime.compare(e1, e2);
-                    }
-                };
+        Comparator<Task> generalComparator = (e1, e2) -> {
+            if (e1.getStartTime() == null || e2.getStartTime() == null) {
+                return comparatorId.compare(e1, e2);
+            } else {
+                return comparatorStartTime.compare(e1, e2);
+            }
+        };
 
         TreeSet<Task> treeSet = new TreeSet<>(generalComparator);
         treeSet.addAll(taskList.values());

@@ -21,35 +21,23 @@ public class Task {
         this.status = Status.NEW;
         this.name = name;
         this.description = description;
-        this.duration = null;
-        this.startTime = null;
-    }
-
-    public Task(String name, String description, int duration, String dateTime) {
-        this.type = TaskTypes.TASK;
-        this.status = Status.NEW;
-        this.name = name;
-        this.description = description;
-        this.duration = Duration.ofMinutes(duration);
-        this.startTime = LocalDateTime.parse(dateTime, formatter);
     }
 
     public Task(Status status, String name, String description) {
-        this.type = TaskTypes.TASK;
+        this(name, description);
         this.status = status;
-        this.name = name;
-        this.description = description;
-        this.duration = null;
-        this.startTime = null;
     }
 
-    public Task(Status status, String name, String description, int duration, String dateTime) {
-        this.type = TaskTypes.TASK;
-        this.status = status;
-        this.name = name;
-        this.description = description;
+    public Task(String name, String description, int duration, String startTime) {
+        this(name, description);
         this.duration = Duration.ofMinutes(duration);
-        this.startTime = LocalDateTime.parse(dateTime, formatter);
+        this.startTime = LocalDateTime.parse(startTime, formatter);
+    }
+
+
+    public Task(Status status, String name, String description, int duration, String startTime) {
+        this(name, description, duration, startTime);
+        this.status = status;
     }
 
     public Integer getId() {
