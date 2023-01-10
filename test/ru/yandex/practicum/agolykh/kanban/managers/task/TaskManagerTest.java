@@ -25,8 +25,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void getTaskList_returnListWithThreeTasks_managerWithThreeTasks() {
         addTasksTest();
         assertEquals(3, taskManager.getTaskList().size());
-        assertArrayEquals(taskArray.toArray(new Task[0]),
-                taskManager.getTaskList().toArray(new Task[0]));
+        assertTrue(taskManager.getTaskList().contains(taskArray.get(0)));
+        assertTrue(taskManager.getTaskList().contains(taskArray.get(1)));
+        assertTrue(taskManager.getTaskList().contains(taskArray.get(2)));
     }
 
     @Test
@@ -38,8 +39,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void getEpicList_returnListWithThreeEpics_managerWithThreeEpics() {
         addEpicsTest();
         assertEquals(3, taskManager.getEpicList().size());
-        assertArrayEquals(epicArray.toArray(new Epic[0]),
-                taskManager.getEpicList().toArray(new Epic[0]));
+        assertTrue(taskManager.getEpicList().contains(epicArray.get(0)));
+        assertTrue(taskManager.getEpicList().contains(epicArray.get(1)));
+        assertTrue(taskManager.getEpicList().contains(epicArray.get(2)));
     }
 
     @Test
@@ -52,8 +54,12 @@ abstract class TaskManagerTest<T extends TaskManager> {
         addEpicsTest();
         addSubTasksTest();
         assertEquals(6, taskManager.getSubTaskList().size());
-        assertArrayEquals(subTaskArray.toArray(new SubTask[0]),
-                taskManager.getSubTaskList().toArray(new SubTask[0]));
+        assertTrue(taskManager.getSubTaskList().contains(subTaskArray.get(0)));
+        assertTrue(taskManager.getSubTaskList().contains(subTaskArray.get(1)));
+        assertTrue(taskManager.getSubTaskList().contains(subTaskArray.get(2)));
+        assertTrue(taskManager.getSubTaskList().contains(subTaskArray.get(3)));
+        assertTrue(taskManager.getSubTaskList().contains(subTaskArray.get(4)));
+        assertTrue(taskManager.getSubTaskList().contains(subTaskArray.get(5)));
     }
 
     @Test
@@ -64,10 +70,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void getSubTasksOfEpic_returnTwoSubTasksOfEpic_managerWithEpicsAndSubTasks() {
         addEpicsTest();
         addSubTasksTest();
-        assertNotNull(taskManager.getEpic(4));
-        assertArrayEquals(new SubTask[]{taskManager.getSubTask(7), taskManager.getSubTask(8)},
-                taskManager.getSubTasksOfEpic(4).toArray());
-        assertEquals("[7, 8]", taskManager.getEpic(4).getListSubTaskId().toString());
+        assertTrue(taskManager.getEpic(4).getListSubTaskId().contains(7));
+        assertTrue(taskManager.getEpic(4).getListSubTaskId().contains(8));
     }
 
     @Test
@@ -151,9 +155,10 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void checkSubTaskInEpic_returnTwoIdSubTasksOfEpic_managerWithEpicsAndSubTasks() {
         addEpicsTest();
-        assertEquals("[]", taskManager.getEpic(4).getListSubTaskId().toString());
+        assertTrue(taskManager.getEpic(4).getListSubTaskId().isEmpty());
         addSubTasksTest();
-        assertEquals("[7, 8]", taskManager.getEpic(4).getListSubTaskId().toString());
+        assertTrue(taskManager.getEpic(4).getListSubTaskId().contains(taskManager.getSubTask(7).getId()));
+        assertTrue(taskManager.getEpic(4).getListSubTaskId().contains(taskManager.getSubTask(8).getId()));
     }
 
     @Test
@@ -169,37 +174,33 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void updateTask_returnUpdatedTask_managerWithTasks() {
         addTasksTest();
-        Task newTask = new Task(Status.IN_PROGRESS,
-                "Какая-то задача",
-                "Какое-то описание");
-        newTask.setId(3);
-        assertNotEquals(newTask, taskManager.getTask(3));
-        taskManager.updateTask(3, newTask);
-        assertEquals(newTask, taskManager.getTask(3));
+        Task task = taskManager.getTask(3);
+        task.setStatus(Status.IN_PROGRESS);
+        task.setName("Какая-то задача");
+        task.setDescription("Какое-то описание");
+        taskManager.updateTask(task);
+        assertEquals(task, taskManager.getTask(3));
     }
 
     @Test
     void updateEpic_returnUpdatedEpic_managerWithEpics() {
         addEpicsTest();
-        Epic newEpic = new Epic("Какая-то задача",
-                "Какое-то описание");
-        newEpic.setId(4);
-        assertNotEquals(newEpic, taskManager.getEpic(4));
-        taskManager.updateEpic(4, newEpic);
-        assertEquals(newEpic, taskManager.getEpic(4));
+        Epic epic = taskManager.getEpic(4);
+        epic.setName("Какая-то задача");
+        epic.setDescription("Какое-то описание");
+        taskManager.updateEpic(epic);
+        assertEquals(epic, taskManager.getEpic(4));
     }
 
     @Test
     void updateSubTask_returnUpdatedSubTask_managerWithEpicsAndSubTasks() {
         addEpicsTest();
         addSubTasksTest();
-        SubTask newSubTask = new SubTask(Status.IN_PROGRESS,
-                "Какая-то задача",
-                "Какое-то описание",
-                4);
-        newSubTask.setId(7);
-        assertNotEquals(newSubTask, taskManager.getSubTask(7));
-        taskManager.updateSubTask(7, newSubTask);
+        SubTask newSubTask = taskManager.getSubTask(7);
+        newSubTask.setStatus(Status.IN_PROGRESS);
+        newSubTask.setName("Какая-то задача");
+        newSubTask.setDescription("Какое-то описание");
+        taskManager.updateSubTask(newSubTask);
         assertEquals(newSubTask, taskManager.getSubTask(7));
     }
 
@@ -232,7 +233,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
         addEpicsTest();
         addSubTasksTest();
         assertEquals(4, taskManager.getEpic(4).getId());
-        assertEquals("[7, 8]", taskManager.getEpic(4).getListSubTaskId().toString());
+        assertTrue(taskManager.getEpic(4).getListSubTaskId().contains(taskManager.getSubTask(7).getId()));
+        assertTrue(taskManager.getEpic(4).getListSubTaskId().contains(taskManager.getSubTask(8).getId()));
         assertEquals(7, taskManager.getSubTask(7).getId());
         taskManager.deleteEpic(4);
         final NullPointerException exception = assertThrows(

@@ -130,36 +130,35 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     // Обновить задачу
-    public void updateTask(int id, Task newTask) {
-        if (taskList.containsKey(id)) {
-            newTask.setId(id);
-            taskList.put(id, newTask);
-            System.out.println("Задача " + id + " обновлена.");
+    public void updateTask(Task newTask) {
+        if (taskList.containsKey(newTask.getId())) {
+            taskList.put(newTask.getId(), newTask);
+            System.out.println("Задача " + newTask.getId() + " обновлена.");
         } else {
-            throw new NullPointerException("Задача " + id + " не найдена.");
+            throw new NullPointerException("Задача " + newTask.getId() + " не найдена.");
         }
     }
 
     // Обновить родительскую задачу
-    public void updateEpic(int id, Epic newEpic) {
-        if (epicList.containsKey(id)) {
-            newEpic.setId(id);
-            epicList.put(id, newEpic);
-            System.out.println("Родительская задача " + id + " обновлена.");
+    public void updateEpic(Epic newEpic) {
+        if (epicList.containsKey(newEpic.getId())) {
+            newEpic.setId(newEpic.getId());
+            epicList.put(newEpic.getId(), newEpic);
+            System.out.println("Родительская задача " + newEpic.getId() + " обновлена.");
         } else {
-            throw new NullPointerException("Родительская задача " + id + " не найдена.");
+            throw new NullPointerException("Родительская задача " + newEpic.getId() + " не найдена.");
         }
     }
 
     // Обновить подзадачу
-    public void updateSubTask(int id, SubTask newSubTask) {
-        if (subTaskList.containsKey(id)) {
-            newSubTask.setId(id);
-            subTaskList.put(id, newSubTask);
-            System.out.println("Подзадача " + id + " обновлена.");
+    public void updateSubTask(SubTask newSubTask) {
+        if (subTaskList.containsKey(newSubTask.getId())) {
+            newSubTask.setId(newSubTask.getId());
+            subTaskList.put(newSubTask.getId(), newSubTask);
+            System.out.println("Подзадача " + newSubTask.getId() + " обновлена.");
             calculateEpic(newSubTask.getEpicId());
         } else {
-            throw new NullPointerException("Подзадача " + id + " не найдена.");
+            throw new NullPointerException("Подзадача " + newSubTask.getId() + " не найдена.");
         }
     }
 

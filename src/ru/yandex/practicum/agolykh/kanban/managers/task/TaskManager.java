@@ -39,13 +39,13 @@ public interface TaskManager {
     void addSubTask(SubTask subTask);
 
     // Обновить задачу
-    void updateTask(int id, Task newTask);
+    void updateTask(Task newTask);
 
     // Обновить родительскую задачу
-    void updateEpic(int id, Epic newEpic);
+    void updateEpic(Epic newEpic);
 
     // Обновить подзадачу
-    void updateSubTask(int id, SubTask newSubTask);
+    void updateSubTask(SubTask newSubTask);
 
     // Удалить задачу
     void deleteTask(int id);

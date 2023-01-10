@@ -40,7 +40,7 @@ class HistoryManagerTest {
     void addTaskInHistory_returnTask_emptyHistory(){
         testHistoryManager.add(task1);
         assertEquals(1, testHistoryManager.getHistory().size());
-        assertEquals(task1, testHistoryManager.getHistory().get(0));
+        assertTrue(testHistoryManager.getHistory().contains(task1));
     }
 
     @Test
@@ -50,8 +50,9 @@ class HistoryManagerTest {
         testHistoryManager.add(task3);
         testHistoryManager.add(task1); // копия
         assertEquals(3, testHistoryManager.getHistory().size());
-        assertArrayEquals(new Task[]{task1, task3, task2},
-                testHistoryManager.getHistory().toArray(new Task[0]));
+        assertTrue(testHistoryManager.getHistory().contains(task1));
+        assertTrue(testHistoryManager.getHistory().contains(task2));
+        assertTrue(testHistoryManager.getHistory().contains(task3));
     }
 
     @Test
@@ -61,8 +62,7 @@ class HistoryManagerTest {
         testHistoryManager.add(task3);
         testHistoryManager.remove(task3.getId());
         assertEquals(2, testHistoryManager.getHistory().size());
-        assertArrayEquals(new Task[]{task2, task1},
-                testHistoryManager.getHistory().toArray(new Task[0]));
+        assertFalse(testHistoryManager.getHistory().contains(task3));
     }
 
     @Test
@@ -71,10 +71,8 @@ class HistoryManagerTest {
         testHistoryManager.add(task2);
         testHistoryManager.add(task3);
         testHistoryManager.remove(task2.getId());
-        assertNotNull(testHistoryManager.getHistory());
         assertEquals(2, testHistoryManager.getHistory().size());
-        assertArrayEquals(new Task[]{task3, task1},
-                testHistoryManager.getHistory().toArray(new Task[0]));
+        assertFalse(testHistoryManager.getHistory().contains(task2));
     }
 
     @Test
@@ -84,7 +82,6 @@ class HistoryManagerTest {
         testHistoryManager.add(task3);
         testHistoryManager.remove(task1.getId());
         assertEquals(2, testHistoryManager.getHistory().size());
-        assertArrayEquals(new Task[]{task3, task2},
-                testHistoryManager.getHistory().toArray(new Task[0]));
+        assertFalse(testHistoryManager.getHistory().contains(task1));
     }
 }

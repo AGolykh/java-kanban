@@ -45,16 +45,32 @@ public class Main {
         System.out.println(taskManager.getEpicList());
         System.out.println(taskManager.getSubTaskList());
 
-        taskManager.updateTask(2, new Task(Status.DONE, null, "Надо шо-то поделать опять"));
-        taskManager.updateSubTask(4, new SubTask(Status.IN_PROGRESS, null, null, 3));
-        taskManager.updateSubTask(5, new SubTask(Status.DONE, "Шо-то сделал", null, 3));
-        taskManager.updateEpic(10, new Epic(null, "Надо шо-то поделать"));
+
+        Task task = taskManager.getTask(1);
+        task.setStatus(Status.DONE);
+        task.setDescription("Надо шо-то поделать опять");
+        taskManager.updateTask(task);
+
+        SubTask subTask = taskManager.getSubTask(4);
+        subTask.setStatus(Status.IN_PROGRESS);
+        taskManager.updateSubTask(subTask);
+
+        subTask = taskManager.getSubTask(5);
+        subTask.setStatus(Status.DONE);
+        subTask.setName("Шо-то сделал");
+        taskManager.updateSubTask(subTask);
+
+        Epic epic = taskManager.getEpic(10);
+        epic.setDescription("Надо шо-то поделать");
+        taskManager.updateEpic(epic);
 
         System.out.println(taskManager.getTaskList());
         System.out.println(taskManager.getEpicList());
         System.out.println(taskManager.getSubTaskList());
 
-        taskManager.updateSubTask(11, new SubTask(Status.DONE, null, null, 10));
+        subTask = taskManager.getSubTask(11);
+        subTask.setStatus(Status.DONE);
+        taskManager.updateSubTask(subTask);
 
         System.out.println(taskManager.getTaskList());
         System.out.println(taskManager.getEpicList());
