@@ -2,6 +2,7 @@ package ru.yandex.practicum.agolykh.kanban.tasks;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 public class SubTask extends Task {
@@ -21,7 +22,9 @@ public class SubTask extends Task {
     public SubTask(String name, String description, int epicId, int duration, String startTime) {
         this(name, description, epicId);
         this.duration = Duration.ofMinutes(duration);
-        this.startTime = LocalDateTime.parse(startTime, formatter);
+        this.startTime = LocalDateTime.parse(startTime,
+                DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
+        this.endTime = getEndTime();
     }
 
     public SubTask(Status status, String name, String description, int epicId, int duration, String startTime) {
@@ -37,9 +40,11 @@ public class SubTask extends Task {
         Long optionalDuration = Optional.ofNullable(duration)
                 .map(Duration::toMinutes).orElse(null);
         String optionalStartTime = Optional.ofNullable(startTime)
-                .map((time) -> time.format(formatter)).orElse(null);
+                .map((time) -> time.format(Task.getFormatter()))
+                .orElse(null);
         String optionalEndTime = Optional.ofNullable(getEndTime())
-                .map((time) -> time.format(formatter)).orElse(null);
+                .map((time) -> time.format(Task.getFormatter()))
+                .orElse(null);
 
         return "SubTask{"
                 + "id=" + id

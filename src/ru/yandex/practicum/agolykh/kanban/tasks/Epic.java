@@ -1,6 +1,7 @@
 package ru.yandex.practicum.agolykh.kanban.tasks;
 
 import java.time.Duration;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -44,9 +45,11 @@ public class Epic extends Task {
         Long optionalDuration = Optional.ofNullable(duration)
                 .map(Duration::toMinutes).orElse(null);
         String optionalStartTime = Optional.ofNullable(startTime)
-                .map((time) -> time.format(formatter)).orElse(null);
+                .map((time) -> time.format(Task.getFormatter()))
+                .orElse(null);
         String optionalEndTime = Optional.ofNullable(getEndTime())
-                .map((time) -> time.format(formatter)).orElse(null);
+                .map((time) -> time.format(Task.getFormatter()))
+                .orElse(null);
 
         return "Epic{"
                 + "id=" + id
