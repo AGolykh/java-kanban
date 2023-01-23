@@ -7,194 +7,225 @@ import ru.yandex.practicum.agolykh.kanban.tasks.Epic;
 import ru.yandex.practicum.agolykh.kanban.tasks.SubTask;
 import ru.yandex.practicum.agolykh.kanban.tasks.Task;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
 
 public class HttpTaskManager extends FileBackedTaskManager {
-    private final String host;
-    private final HttpClient client;
-    private final Gson gson;
+    KVTaskClient kvTaskClient;
+    Gson gson;
+    String host;
 
     public HttpTaskManager(String host) {
         this.host = host;
-        this.client = HttpClient.newHttpClient();
+        kvTaskClient = new KVTaskClient(this.host);
         this.gson = new GsonBuilder()
-                .registerTypeAdapter(LocalDateTime.class, new Task.LocalDateTimeAdapter())
-                .registerTypeAdapter(Duration.class, new Task.DurationAdapter())
+                .registerTypeAdapter(LocalDateTime.class, new Adapters.LocalDateTimeAdapter())
+                .registerTypeAdapter(Duration.class, new Adapters.DurationAdapter())
                 .setPrettyPrinting()
                 .serializeNulls()
                 .create();
     }
 
-    @Override
-    public Task getTask(int id) {
-        String endpoint = "/tasks/task/?id=" + id;
-        return gson.fromJson(sendRequest(endpoint, "GET", null).body(), Task.class);
+    public void loadManager() {
+        if (kvTaskClient.load("tasks") != null) {
+            ArrayList<Task> tasksFromServer = gson.fromJson(kvTaskClient.load("Tasks"),
+                    new TypeToken<ArrayList<Task>>() {
+                    }.getType());
+            for (Task task : tasksFromServer) {
+                super.taskList.put(task.getId(), task);
+            }
+        }
+
+        if (kvTaskClient.load("epics") != null) {
+            ArrayList<Epic> epicsFromServer = gson.fromJson(kvTaskClient.load("Epics"),
+                    new TypeToken<ArrayList<Epic>>() {
+                    }.getType());
+            for (Epic epic : epicsFromServer) {
+                super.epicList.put(epic.getId(), epic);
+            }
+
+            if (kvTaskClient.load("subtasks") != null) {
+                ArrayList<SubTask> subTasksFromServer = gson.fromJson(kvTaskClient.load("SubTasks"),
+                        new TypeToken<ArrayList<SubTask>>() {
+                        }.getType());
+                for (SubTask subTask : subTasksFromServer) {
+                    super.subTaskList.put(subTask.getId(), subTask);
+                }
+            }
+        }
+
+        if (kvTaskClient.load("history") == null) {
+            return;
+        }
+        ArrayList<Integer> historyFromServer = gson.fromJson(kvTaskClient.load("history"),
+                new TypeToken<ArrayList<Integer>>() {
+                }.getType());
+        for (int i = historyFromServer.size() - 1; i >= 0; i--) {
+            if (taskList.containsKey(historyFromServer.get(i))) {
+                super.history.add(taskList.get(historyFromServer.get(i)));
+            } else if (epicList.containsKey(historyFromServer.get(i))) {
+                super.history.add(epicList.get(historyFromServer.get(i)));
+            } else if (subTaskList.containsKey(historyFromServer.get(i))) {
+                super.history.add(subTaskList.get(historyFromServer.get(i)));
+            }
+        }
     }
 
-    @Override
-    public Epic getEpic(int id) {
-        String endpoint = "/tasks/epic/?id=" + id;
-        return gson.fromJson(sendRequest(endpoint, "GET", null).body(), Epic.class);
-    }
-
-    @Override
-    public SubTask getSubTask(int id) {
-        String endpoint = "/tasks/subtask/?id=" + id;
-        return gson.fromJson(sendRequest(endpoint, "GET", null).body(), SubTask.class);
+    public void saveManager() {
+        ArrayList<Integer> history = new ArrayList<>();
+        for (Task task : super.getHistory()) {
+            history.add(task.getId());
+        }
+        kvTaskClient.put("tasks", gson.toJson(super.getTaskList()));
+        kvTaskClient.put("epics", gson.toJson(super.getEpicList()));
+        kvTaskClient.put("subtasks", gson.toJson(super.getSubTaskList()));
+        kvTaskClient.put("history", gson.toJson(history));
     }
 
     @Override
     public ArrayList<Task> getTaskList() {
-        String endpoint = "/tasks/task/";
-        return gson.fromJson(sendRequest(endpoint, "GET",null).body(),
-                new TypeToken<ArrayList<Task>>(){}.getType());
+        loadManager();
+        return super.getTaskList();
     }
 
     @Override
     public ArrayList<Epic> getEpicList() {
-        String endpoint = "/tasks/epic/";
-        return gson.fromJson(sendRequest(endpoint, "GET",null).body(),
-                new TypeToken<ArrayList<Epic>>(){}.getType());
+        loadManager();
+        return super.getEpicList();
     }
 
     @Override
     public ArrayList<SubTask> getSubTaskList() {
-        String endpoint = "/tasks/subtask/";
-        return gson.fromJson(sendRequest(endpoint, "GET",null).body(),
-                new TypeToken<ArrayList<SubTask>>(){}.getType());
+        loadManager();
+        return super.getSubTaskList();
     }
 
     @Override
     public ArrayList<SubTask> getSubTasksOfEpic(int id) {
-        String endpoint = "/tasks/subtask/epic?id=" + id;
-        return gson.fromJson(sendRequest(endpoint, "GET",null).body(),
-                new TypeToken<ArrayList<SubTask>>(){}.getType());
+        loadManager();
+        return super.getSubTasksOfEpic(id);
+    }
+
+    @Override
+    public Task getTask(int id) {
+        loadManager();
+        Task task = super.getTask(id);
+        saveManager();
+        return task;
+    }
+
+    @Override
+    public Epic getEpic(int id) {
+        loadManager();
+        Epic epic = super.getEpic(id);
+        saveManager();
+        return epic;
+    }
+
+    @Override
+    public SubTask getSubTask(int id) {
+        loadManager();
+        SubTask subTask = super.getSubTask(id);
+        saveManager();
+        return subTask;
     }
 
     @Override
     public void addTask(Task task) {
-        String endpoint = "/tasks/task/";
-        System.out.println(gson.toJson(task));
-        final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(gson.toJson(task));
-        sendRequest(endpoint, "POST", body);
+        loadManager();
+        super.addTask(task);
+        saveManager();
     }
 
     @Override
     public void addEpic(Epic epic) {
-        String endpoint = "/tasks/epic/";
-        final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(gson.toJson(epic));
-        sendRequest(endpoint, "POST", body);
+        loadManager();
+        super.addEpic(epic);
+        saveManager();
     }
 
     @Override
     public void addSubTask(SubTask subTask) {
-        String endpoint = "/tasks/subtask/";
-        final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(gson.toJson(subTask));
-        sendRequest(endpoint, "POST", body);
+        loadManager();
+        super.addSubTask(subTask);
+        saveManager();
     }
 
     @Override
     public void updateTask(Task newTask) {
-        String endpoint = "/tasks/task/";
-        final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(gson.toJson(newTask));
-        sendRequest(endpoint, "POST", body);
+        loadManager();
+        super.updateTask(newTask);
+        saveManager();
     }
 
     @Override
     public void updateEpic(Epic newEpic) {
-        String endpoint = "/tasks/epic/";
-        final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(gson.toJson(newEpic));
-        sendRequest(endpoint, "POST", body);
+        loadManager();
+        super.updateEpic(newEpic);
+        saveManager();
     }
 
     @Override
     public void updateSubTask(SubTask newSubTask) {
-        String endpoint = "/tasks/subtask/";
-        final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(gson.toJson(newSubTask));
-        sendRequest(endpoint, "POST", body);
+        loadManager();
+        super.updateSubTask(newSubTask);
+        saveManager();
     }
 
     @Override
     public void deleteTask(int id) {
-        String endpoint = "/tasks/task/?id=" + id;
-        sendRequest(endpoint, "DELETE", null);
+        loadManager();
+        super.deleteTask(id);
+        saveManager();
     }
 
     @Override
     public void deleteEpic(int id) {
-        String endpoint = "/tasks/epic/?id=" + id;
-        sendRequest(endpoint, "DELETE", null);
+        loadManager();
+        super.deleteEpic(id);
+        saveManager();
     }
 
     @Override
     public void deleteSubTask(int id) {
-        String endpoint = "/tasks/subtask/?id=" + id;
-        sendRequest(endpoint, "DELETE", null);
+        loadManager();
+        super.deleteSubTask(id);
+        saveManager();
     }
+
 
     @Override
     public void clearTaskList() {
-        String endpoint = "/tasks/task";
-        sendRequest(endpoint, "DELETE", null);
+        loadManager();
+        super.clearTaskList();
+        saveManager();
     }
 
     @Override
     public void clearEpicList() {
-        String endpoint = "/tasks/epic";
-        sendRequest(endpoint, "DELETE", null);
+        loadManager();
+        super.clearEpicList();
+        saveManager();
     }
 
     @Override
     public void clearSubTaskList() {
-        String endpoint = "/tasks/subtask";
-        sendRequest(endpoint, "DELETE", null);
+        loadManager();
+        super.clearSubTaskList();
+        saveManager();
     }
 
     @Override
-    public Set<Task> getPrioritizedTasks() { // Сервер формирует множество
-        String endpoint = "/tasks";
-        return gson.fromJson(sendRequest(endpoint, "GET",null).body(),
-                new TypeToken<HashSet<Task>>(){}.getType());
-        /*Сервер формирует множество из классов TASK и SUBTASK
-        При десериализации получается множество только из TASK,
-        как можно сделать так, что бы получаемое множество было таким же, как и отправляемое?*/
+    public Set<Task> getPrioritizedTasks() {
+        loadManager();
+        return super.getPrioritizedTasks();
     }
 
     @Override
     public ArrayList<Task> getHistory() {
-        String endpoint = "/tasks/history";
-        return gson.fromJson(sendRequest(endpoint, "GET",null).body(),
-                new TypeToken<ArrayList<Task>>(){}.getType());
-    }
-
-    private HttpResponse<String> sendRequest(String endpoint,
-                                             String method,
-                                             HttpRequest.BodyPublisher body) {
-        HttpResponse<String> response = null;
-        URI url = URI.create(this.host + endpoint);
-        HttpRequest request = null;
-        if (method.equals("GET")) {
-            request = HttpRequest.newBuilder().uri(url).GET().build();
-        } else if (method.equals("POST") && (body != null)) {
-            request = HttpRequest.newBuilder().uri(url).POST(body).build();
-        } else if (method.equals("DELETE")) {
-            request = HttpRequest.newBuilder().uri(url).DELETE().build();
-        }
-        try {
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса ресурса по URL-адресу: '" + url + "', возникла ошибка.\n" +
-                    "Проверьте, пожалуйста, адрес и повторите попытку.");
-        }
-        return response;
+        loadManager();
+        return super.getHistory();
     }
 }

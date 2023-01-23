@@ -1,10 +1,5 @@
 package ru.yandex.practicum.agolykh.kanban.tasks;
 
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-
-import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -150,30 +145,6 @@ public class Task {
                 && status.equals(task.status)
                 && name.equals(task.name)
                 && description.equals(task.description);
-    }
-
-    public static class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
-        @Override
-        public void write(final JsonWriter jsonWriter, final LocalDateTime localDateTime) throws IOException {
-            jsonWriter.value(localDateTime.format(Task.getFormatter()));
-        }
-
-        @Override
-        public LocalDateTime read(final JsonReader jsonReader) throws IOException {
-            return LocalDateTime.parse(jsonReader.nextString(), Task.getFormatter());
-        }
-    }
-
-    public static class DurationAdapter extends TypeAdapter<Duration> {
-        @Override
-        public void write(final JsonWriter jsonWriter, final Duration duration) throws IOException {
-            jsonWriter.value(duration.toMinutes());
-        }
-
-        @Override
-        public Duration read(final JsonReader jsonReader) throws IOException {
-            return Duration.ofMinutes(Integer.parseInt(jsonReader.nextString()));
-        }
     }
 
 /*    public static class TasksAdapter extends TypeAdapter<Task> {

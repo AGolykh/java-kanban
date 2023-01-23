@@ -86,9 +86,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Расстановка id
     private Integer makeId(Integer id) {
-        int result;
-        result = Objects.requireNonNullElseGet(id, () -> ++nextId);
-        return result;
+        if (id != null) {
+            nextId = id;
+            return id;
+        }
+        return ++nextId;
     }
 
     // Добавить задачу
@@ -288,6 +290,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Проверка свободного времени
     private boolean validateTime(Task task) {
+        if (getPrioritizedTasks().isEmpty()) {
+            return true;
+        }
         for (Task taskFromList : getPrioritizedTasks()) {
             if ((taskFromList.getStartTime() != null) && (task.getStartTime() != null)) {
                 boolean startTimeValid = task.getStartTime().isBefore(taskFromList.getStartTime())

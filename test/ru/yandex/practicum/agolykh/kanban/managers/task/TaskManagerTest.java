@@ -66,6 +66,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void getNullSubTaskList_returnEmptyList_emptyManager() {
         assertTrue(taskManager.getSubTaskList().isEmpty());
     }
+
     @Test
     void getSubTasksOfEpic_returnTwoSubTasksOfEpic_managerWithEpicsAndSubTasks() {
         addEpicsTest();

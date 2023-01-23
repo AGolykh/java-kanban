@@ -191,6 +191,4 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         super.clearSubTaskList();
         save();
     }
-
-
 }

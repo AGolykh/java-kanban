@@ -6,8 +6,6 @@ import java.time.Duration;
 import java.util.Optional;
 
 public class Converter {
-
-
     public static Task taskFromString(String value) {
         Task result;
         String[] elements = value.split(",");
@@ -64,9 +62,9 @@ public class Converter {
         Long optionalDuration = Optional.ofNullable(task.getDuration())
                 .map(Duration::toMinutes).orElse(null);
         String optionalStartTime = Optional.ofNullable(task.getStartTime())
-                .map((time) -> time.format(task.getFormatter())).orElse(null);
+                .map((time) -> time.format(Task.getFormatter())).orElse(null);
         String optionalEndTime = Optional.ofNullable(task.getEndTime())
-                .map((time) -> time.format(task.getFormatter())).orElse(null);
+                .map((time) -> time.format(Task.getFormatter())).orElse(null);
 
         StringBuilder result = new StringBuilder()
                 .append(task.getId()).append(',')
@@ -84,9 +82,9 @@ public class Converter {
         Long optionalDuration = Optional.ofNullable(subTask.getDuration())
                 .map(Duration::toMinutes).orElse(null);
         String optionalStartTime = Optional.ofNullable(subTask.getStartTime())
-                .map((time) -> time.format(subTask.getFormatter())).orElse(null);
+                .map((time) -> time.format(Task.getFormatter())).orElse(null);
         String optionalEndTime = Optional.ofNullable(subTask.getEndTime())
-                .map((time) -> time.format(subTask.getFormatter())).orElse(null);
+                .map((time) -> time.format(Task.getFormatter())).orElse(null);
 
         StringBuilder result = new StringBuilder()
                 .append(subTask.getId()).append(',')
