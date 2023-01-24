@@ -1,4 +1,4 @@
-package ru.yandex.practicum.agolykh.kanban.managers.task;
+package ru.yandex.practicum.agolykh.kanban.managers;
 
 import ru.yandex.practicum.agolykh.kanban.tasks.Epic;
 import ru.yandex.practicum.agolykh.kanban.tasks.SubTask;

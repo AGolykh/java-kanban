@@ -1,8 +1,9 @@
-package ru.yandex.practicum.agolykh.kanban.managers.task;
+package ru.yandex.practicum.agolykh.kanban.managers.http;
 
 import org.junit.jupiter.api.BeforeAll;
-import ru.yandex.practicum.agolykh.kanban.http.KVServer;
-import ru.yandex.practicum.agolykh.kanban.managers.Managers;
+import org.junit.jupiter.api.BeforeEach;
+import ru.yandex.practicum.agolykh.kanban.managers.TaskManagerTest;
+import ru.yandex.practicum.agolykh.kanban.server.KVServer;
 import ru.yandex.practicum.agolykh.kanban.tasks.Epic;
 import ru.yandex.practicum.agolykh.kanban.tasks.SubTask;
 import ru.yandex.practicum.agolykh.kanban.tasks.Task;
@@ -12,23 +13,31 @@ import java.util.ArrayList;
 
 
 class HttpTaskManagerTest extends TaskManagerTest {
+
     public static KVServer kvServer;
+    public static HttpTaskServer httpTaskServer;
+
+
     public HttpTaskManagerTest() {
-        super.setManager(Managers.getHttpTaskManager("http://localhost:8078"));
+        super.setManager(httpTaskServer.getManager());
     }
 
     @BeforeAll
-    static void beforeAll() {
-        try {
-            kvServer = new KVServer();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    static void beforeAll() throws IOException {
+        kvServer = new KVServer();
         kvServer.start();
+        httpTaskServer = new HttpTaskServer(8080);
+        httpTaskServer.start();
+    }
+
+    @BeforeEach
+    void beforeEach() {
+        manager.clearTaskList();
+        manager.clearEpicList();
     }
 
     @Override
-    void addTasksTest() {
+    public void addTasksTest() {
         taskArray = new ArrayList<>();
         taskArray.add(new Task("Задача 1", "Описание задачи 1", 45, "14.01.2023 07:30"));
         taskArray.add(new Task("Задача 2", "Описание задачи 2",45, "14.01.2023 08:30"));
@@ -38,12 +47,12 @@ class HttpTaskManagerTest extends TaskManagerTest {
         }
 
         for (Task task : taskArray) {
-            taskManager.addTask(task);
+            manager.addTask(task);
         }
     }
 
     @Override
-    void addEpicsTest() {
+    public void addEpicsTest() {
         epicArray = new ArrayList<>();
         epicArray.add(new Epic("Эпик 1", "Описание эпика 1"));
         epicArray.add(new Epic("Эпик 2", "Описание эпика 2"));
@@ -54,12 +63,12 @@ class HttpTaskManagerTest extends TaskManagerTest {
         }
 
         for (Epic epic : epicArray) {
-            taskManager.addEpic(epic);
+            manager.addEpic(epic);
         }
     }
 
     @Override
-    void addSubTasksTest() {
+    public void addSubTasksTest() {
         subTaskArray = new ArrayList<>();
         subTaskArray.add(new SubTask("Подзадача 1", "Описание подзадачи 1", 4, 45, "14.01.2023 10:30"));
         subTaskArray.add(new SubTask("Подзадача 2", "Описание подзадачи 2", 4, 45, "14.01.2023 11:30"));
@@ -74,7 +83,7 @@ class HttpTaskManagerTest extends TaskManagerTest {
         }
 
         for (SubTask subTask : subTaskArray) {
-            taskManager.addSubTask(subTask);
+            manager.addSubTask(subTask);
         }
     }
 }

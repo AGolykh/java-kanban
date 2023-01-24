@@ -1,7 +1,8 @@
-package ru.yandex.practicum.agolykh.kanban.managers.task;
+package ru.yandex.practicum.agolykh.kanban.managers.file;
 
 import ru.yandex.practicum.agolykh.kanban.exceptions.ManagerSaveException;
 import ru.yandex.practicum.agolykh.kanban.managers.history.HistoryManager;
+import ru.yandex.practicum.agolykh.kanban.managers.memory.InMemoryTaskManager;
 import ru.yandex.practicum.agolykh.kanban.tasks.Epic;
 import ru.yandex.practicum.agolykh.kanban.tasks.SubTask;
 import ru.yandex.practicum.agolykh.kanban.tasks.Task;
@@ -12,9 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
-    private final String dir = System.getProperty("user.dir") + "\\resources\\";
-    private final String fileName = "Tasks.csv";
-    private String path = dir + fileName;
+    private String path;
+
+    public FileBackedTaskManager(String fileName) {
+        final String dir = System.getProperty("user.dir") + "\\resources\\";
+        this.path = dir + fileName;
+    }
+
+    public FileBackedTaskManager() {
+    }
 
     public void setPath(String path) {
         this.path = path;
@@ -22,7 +29,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     // Создание экземпляра класса с данными из файла
     public static FileBackedTaskManager loadFromFile(File file) {
-        FileBackedTaskManager result = new FileBackedTaskManager();
+        FileBackedTaskManager result = new FileBackedTaskManager("Tasks.csv");
         ArrayList<SubTask> tempSubTaskList = new ArrayList<>();
         try (FileReader reader = new FileReader(file, StandardCharsets.UTF_8);
              BufferedReader br = new BufferedReader(reader)) {

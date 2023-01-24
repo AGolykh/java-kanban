@@ -1,4 +1,4 @@
-package ru.yandex.practicum.agolykh.kanban.managers.task;
+package ru.yandex.practicum.agolykh.kanban.managers.http;
 
 import java.io.IOException;
 import java.net.URI;

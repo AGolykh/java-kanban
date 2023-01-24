@@ -1,8 +1,10 @@
-package ru.yandex.practicum.agolykh.kanban.managers.task;
+package ru.yandex.practicum.agolykh.kanban.managers.file;
 
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.agolykh.kanban.exceptions.ManagerSaveException;
 import ru.yandex.practicum.agolykh.kanban.managers.Managers;
+import ru.yandex.practicum.agolykh.kanban.managers.TaskManager;
+import ru.yandex.practicum.agolykh.kanban.managers.TaskManagerTest;
 import ru.yandex.practicum.agolykh.kanban.tasks.Epic;
 import ru.yandex.practicum.agolykh.kanban.tasks.Status;
 import ru.yandex.practicum.agolykh.kanban.tasks.SubTask;
@@ -11,11 +13,10 @@ import ru.yandex.practicum.agolykh.kanban.tasks.Task;
 import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FileBackedTaskManagerTest extends TaskManagerTest {
     public FileBackedTaskManagerTest() {
-        super.setManager(Managers.getFileBacked());
+        super.setManager(Managers.getFileBacked("Tasks.csv"));
     }
 
     @Test
@@ -95,8 +96,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
         final String dir = System.getProperty("user.dir") + "\\resources\\";
         final String fileName = "FileForEmptyFileBackedManager.csv";
         final String path = dir + fileName;
-        FileBackedTaskManager toFile = new FileBackedTaskManager();
-        toFile.setPath(path);
+        FileBackedTaskManager toFile = new FileBackedTaskManager(fileName);
         assertEquals(0, toFile.getTaskList().size());
         assertEquals(0, toFile.getEpicList().size());
         assertEquals(0, toFile.getSubTaskList().size());
@@ -114,9 +114,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
         final String dir = System.getProperty("user.dir") + "\\resources\\";
         final String fileName = "FileForSavingFileBackedManager.csv";
         final String path = dir + fileName;
-        FileBackedTaskManager toFile = new FileBackedTaskManager();
-        toFile.setPath(path);
-
+        FileBackedTaskManager toFile = new FileBackedTaskManager("FileForSavingFileBackedManager.csv");
         Task task = new Task(Status.DONE, "Задача 1", "Описание задачи 1");
         Epic epic = new Epic(Status.DONE, "Родительская задача 1", "Описание родительской задачи 1");
         SubTask subTask = new SubTask(Status.IN_PROGRESS, "Подзадача 1", "Описание подзадачи 1", 2);
@@ -131,7 +129,6 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
         assertEquals(task, fromFile.getTask(1));
         assertEquals(epic, fromFile.getEpic(2));
         assertEquals(1, fromFile.getSubTaskList().size());
-
     }
 }
 

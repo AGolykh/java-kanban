@@ -1,8 +1,11 @@
-package ru.yandex.practicum.agolykh.kanban.managers.task;
+package ru.yandex.practicum.agolykh.kanban.managers.http;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import ru.yandex.practicum.agolykh.kanban.managers.file.FileBackedTaskManager;
+import ru.yandex.practicum.agolykh.kanban.managers.http.adapters.DurationAdapter;
+import ru.yandex.practicum.agolykh.kanban.managers.http.adapters.LocalDateTimeAdapter;
 import ru.yandex.practicum.agolykh.kanban.tasks.Epic;
 import ru.yandex.practicum.agolykh.kanban.tasks.SubTask;
 import ru.yandex.practicum.agolykh.kanban.tasks.Task;
@@ -15,20 +18,18 @@ import java.util.Set;
 public class HttpTaskManager extends FileBackedTaskManager {
     KVTaskClient kvTaskClient;
     Gson gson;
-    String host;
 
     public HttpTaskManager(String host) {
-        this.host = host;
-        kvTaskClient = new KVTaskClient(this.host);
+        kvTaskClient = new KVTaskClient(host);
         this.gson = new GsonBuilder()
-                .registerTypeAdapter(LocalDateTime.class, new Adapters.LocalDateTimeAdapter())
-                .registerTypeAdapter(Duration.class, new Adapters.DurationAdapter())
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .registerTypeAdapter(Duration.class, new DurationAdapter())
                 .setPrettyPrinting()
                 .serializeNulls()
                 .create();
     }
 
-    public void loadManager() {
+    public void load() {
         if (kvTaskClient.load("tasks") != null) {
             ArrayList<Task> tasksFromServer = gson.fromJson(kvTaskClient.load("Tasks"),
                     new TypeToken<ArrayList<Task>>() {
@@ -73,7 +74,8 @@ public class HttpTaskManager extends FileBackedTaskManager {
         }
     }
 
-    public void saveManager() {
+    @Override
+    public void save() {
         ArrayList<Integer> history = new ArrayList<>();
         for (Task task : super.getHistory()) {
             history.add(task.getId());
@@ -86,146 +88,128 @@ public class HttpTaskManager extends FileBackedTaskManager {
 
     @Override
     public ArrayList<Task> getTaskList() {
-        loadManager();
+        load();
         return super.getTaskList();
     }
 
     @Override
     public ArrayList<Epic> getEpicList() {
-        loadManager();
+        load();
         return super.getEpicList();
     }
 
     @Override
     public ArrayList<SubTask> getSubTaskList() {
-        loadManager();
+        load();
         return super.getSubTaskList();
     }
 
     @Override
     public ArrayList<SubTask> getSubTasksOfEpic(int id) {
-        loadManager();
+        load();
         return super.getSubTasksOfEpic(id);
     }
 
     @Override
     public Task getTask(int id) {
-        loadManager();
-        Task task = super.getTask(id);
-        saveManager();
-        return task;
+        load();
+        return super.getTask(id);
     }
 
     @Override
     public Epic getEpic(int id) {
-        loadManager();
-        Epic epic = super.getEpic(id);
-        saveManager();
-        return epic;
+        load();
+        return super.getEpic(id);
     }
 
     @Override
     public SubTask getSubTask(int id) {
-        loadManager();
-        SubTask subTask = super.getSubTask(id);
-        saveManager();
-        return subTask;
+        load();
+        return super.getSubTask(id);
     }
 
     @Override
     public void addTask(Task task) {
-        loadManager();
+        load();
         super.addTask(task);
-        saveManager();
     }
 
     @Override
     public void addEpic(Epic epic) {
-        loadManager();
+        load();
         super.addEpic(epic);
-        saveManager();
     }
 
     @Override
     public void addSubTask(SubTask subTask) {
-        loadManager();
+        load();
         super.addSubTask(subTask);
-        saveManager();
     }
 
     @Override
     public void updateTask(Task newTask) {
-        loadManager();
+        load();
         super.updateTask(newTask);
-        saveManager();
     }
 
     @Override
     public void updateEpic(Epic newEpic) {
-        loadManager();
+        load();
         super.updateEpic(newEpic);
-        saveManager();
     }
 
     @Override
     public void updateSubTask(SubTask newSubTask) {
-        loadManager();
+        load();
         super.updateSubTask(newSubTask);
-        saveManager();
     }
 
     @Override
     public void deleteTask(int id) {
-        loadManager();
+        load();
         super.deleteTask(id);
-        saveManager();
     }
 
     @Override
     public void deleteEpic(int id) {
-        loadManager();
+        load();
         super.deleteEpic(id);
-        saveManager();
     }
 
     @Override
     public void deleteSubTask(int id) {
-        loadManager();
+        load();
         super.deleteSubTask(id);
-        saveManager();
     }
 
 
     @Override
     public void clearTaskList() {
-        loadManager();
+        load();
         super.clearTaskList();
-        saveManager();
     }
 
     @Override
     public void clearEpicList() {
-        loadManager();
+        load();
         super.clearEpicList();
-        saveManager();
     }
 
     @Override
     public void clearSubTaskList() {
-        loadManager();
+        load();
         super.clearSubTaskList();
-        saveManager();
     }
 
     @Override
     public Set<Task> getPrioritizedTasks() {
-        loadManager();
+        load();
         return super.getPrioritizedTasks();
     }
 
     @Override
     public ArrayList<Task> getHistory() {
-        loadManager();
+        load();
         return super.getHistory();
     }
 }

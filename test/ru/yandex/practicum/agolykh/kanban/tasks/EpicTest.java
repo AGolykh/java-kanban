@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.agolykh.kanban.managers.Managers;
-import ru.yandex.practicum.agolykh.kanban.managers.task.TaskManager;
+import ru.yandex.practicum.agolykh.kanban.managers.TaskManager;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,7 +13,7 @@ class EpicTest {
 
     @BeforeAll
     static void beforeAll() {
-        testTaskManager = Managers.getDefault();
+        testTaskManager = Managers.getInMemory();
         testTaskManager.addEpic(
                 new Epic("Тестовый эпик", "Описание тестового эпика"));
     }
