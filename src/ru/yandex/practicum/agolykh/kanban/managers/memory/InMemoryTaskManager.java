@@ -108,6 +108,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void addEpic(Epic epic) {
         epic.setId(makeId(epic.getId()));
         epicList.put(epic.getId(), epic);
+        makeListSubTaskForEpic();
         System.out.println("Родительская задача " + epic.getId() + " добавлена.");
     }
 
@@ -117,19 +118,22 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
         subTask.setId(makeId(subTask.getId()));
-        int id = subTask.getId();
-        int epicId = subTask.getEpicId();
-        if (epicList.containsKey(epicId)) {
-            Epic epic = epicList.get(epicId);
-            subTaskList.put(subTask.getId(), subTask);
-            epic.addSubTaskId(id);
-            epicList.put(epicId, epic);
-            calculateEpic(epicId);
-            System.out.println("Подзадача " + id + " добавлена в родительскую задачу " + epicId + '.');
-        } else {
-            throw new NullPointerException("Родительская задача " + epicId + " не обнаружена.");
-        }
+        subTaskList.put(subTask.getId(), subTask);
+        makeListSubTaskForEpic();
+        System.out.println("Подзадача " + subTask.getId() + " добавлена.");
+    }
 
+    public void makeListSubTaskForEpic() {
+        for (Epic epic : epicList.values()) {
+            for (SubTask subTask : subTaskList.values()) {
+                if(subTask.getEpicId() == epic.getId()) {
+                    epic.getListSubTaskId().add(subTask.getId());
+                    System.out.println("Подзадача " + subTask.getId() +
+                            " добавлена в родительскую задачу " + epic.getId() + '.');
+                    calculateEpic(epic.getId());
+                }
+            }
+        }
     }
 
     // Обновить задачу
@@ -213,12 +217,21 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Очистить список обычных задач
     public void clearTaskList() {
+        for (Integer integer : taskList.keySet()) {
+            history.remove(integer);
+        }
         taskList.clear();
         System.out.println("Список обычных задач удален.");
     }
 
     // Очистить список родительских задач
     public void clearEpicList() {
+        for (Integer integer : subTaskList.keySet()) {
+            history.remove(integer);
+        }
+        for (Integer integer : epicList.keySet()) {
+            history.remove(integer);
+        }
         epicList.clear();
         subTaskList.clear();
         System.out.println("Список родительских задач c подзадачами удален.");
@@ -229,7 +242,7 @@ public class InMemoryTaskManager implements TaskManager {
         subTaskList.clear();
         for (Integer id : epicList.keySet()) {
             Epic epic = epicList.get(id);
-            epic.listSubTaskId.clear();
+            epic.getListSubTaskId().clear();
             epicList.put(id, epic);
             calculateEpic(id);
         }
@@ -248,9 +261,14 @@ public class InMemoryTaskManager implements TaskManager {
             Set<Status> statusSet = new HashSet<>();
             Epic epic = epicList.get(id);
             Status oldStatus = epic.getStatus();
-            for (Integer idSubTask : epic.getListSubTaskId()) {
-                SubTask subTask = subTaskList.get(idSubTask);
-                statusSet.add(subTask.getStatus());
+
+            for (Integer idSubTask : subTaskList.keySet()) {
+                for (Integer idSubTaskFromEpic : epic.getListSubTaskId()) {
+                    if (idSubTask.equals(idSubTaskFromEpic)) {
+                        SubTask subTask = subTaskList.get(idSubTask);
+                        statusSet.add(subTask.getStatus());
+                    }
+                }
             }
 
             if ((statusSet.contains(Status.NEW)
@@ -275,11 +293,15 @@ public class InMemoryTaskManager implements TaskManager {
         TreeSet<SubTask> mapOfSubTask = new TreeSet<>(Comparator.comparing(Task::getStartTime));
         if (epicList.containsKey(id)) {
             Epic epic = epicList.get(id);
-            for (Integer idOfSubTask : epicList.get(id).getListSubTaskId()) {
-                if (subTaskList.get(idOfSubTask).getStartTime() != null) {
-                    mapOfSubTask.add(subTaskList.get(idOfSubTask));
+            for (Integer idSubTask : subTaskList.keySet()) {
+                for (Integer idSubTaskFromEpic : epic.getListSubTaskId()) {
+                    if (idSubTask.equals(idSubTaskFromEpic)
+                            && subTaskList.get(idSubTask).getStartTime() != null) {
+                        mapOfSubTask.add(subTaskList.get(idSubTask));
+                    }
                 }
             }
+
             if(!mapOfSubTask.isEmpty()) {
                 epic.setStartTime(mapOfSubTask.first().getStartTime());
                 epic.setDuration(Duration.between(epic.getStartTime(),

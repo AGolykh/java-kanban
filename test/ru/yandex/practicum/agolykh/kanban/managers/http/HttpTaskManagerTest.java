@@ -2,21 +2,25 @@ package ru.yandex.practicum.agolykh.kanban.managers.http;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.agolykh.kanban.local_server.HttpTaskServer;
+import ru.yandex.practicum.agolykh.kanban.managers.TaskManager;
 import ru.yandex.practicum.agolykh.kanban.managers.TaskManagerTest;
-import ru.yandex.practicum.agolykh.kanban.server.KVServer;
+import ru.yandex.practicum.agolykh.kanban.remote_server.KVServer;
 import ru.yandex.practicum.agolykh.kanban.tasks.Epic;
+import ru.yandex.practicum.agolykh.kanban.tasks.Status;
 import ru.yandex.practicum.agolykh.kanban.tasks.SubTask;
 import ru.yandex.practicum.agolykh.kanban.tasks.Task;
 
 import java.io.IOException;
-import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-class HttpTaskManagerTest extends TaskManagerTest {
-
+class HttpTaskManagerTest extends TaskManagerTest<HttpTaskManager> {
     public static KVServer kvServer;
     public static HttpTaskServer httpTaskServer;
-
 
     public HttpTaskManagerTest() {
         super.setManager(httpTaskServer.getManager());
@@ -32,58 +36,94 @@ class HttpTaskManagerTest extends TaskManagerTest {
 
     @BeforeEach
     void beforeEach() {
+        super.setManager(httpTaskServer.getManager());
         manager.clearTaskList();
         manager.clearEpicList();
+        manager.clearSubTaskList();
     }
 
-    @Override
-    public void addTasksTest() {
-        taskArray = new ArrayList<>();
-        taskArray.add(new Task("Задача 1", "Описание задачи 1", 45, "14.01.2023 07:30"));
-        taskArray.add(new Task("Задача 2", "Описание задачи 2",45, "14.01.2023 08:30"));
-        taskArray.add(new Task("Задача 3", "Описание задачи 3", 45, "14.01.2023 09:30"));
-        for (int i = 0; i <= 2; i++) {
-            taskArray.get(i).setId(i + 1);
-        }
-
-        for (Task task : taskArray) {
-            manager.addTask(task);
-        }
+    @Test
+    void importFromServer_returnRightManager_normalDataSet() {
+        addTasksTest();
+        addEpicsTest();
+        addSubTasksTest();
+        manager.getTask(1);
+        manager.getEpic(4);
+        manager.getSubTask(7);
+        TaskManager fromServer = new HttpTaskManager("http://localhost:8078");
+        assertEquals(3, fromServer.getHistory().size());
+        assertEquals(3, fromServer.getTaskList().size());
+        assertEquals(3, fromServer.getEpicList().size());
+        assertEquals(6, fromServer.getSubTaskList().size());
+        assertEquals(2, fromServer.getEpic(4).getListSubTaskId().size());
+        assertTrue(fromServer.getEpic(4).getListSubTaskId().contains(7));
+        assertTrue(fromServer.getEpic(5).getListSubTaskId().contains(9));
+        assertTrue(fromServer.getEpic(6).getListSubTaskId().contains(11));
     }
 
-    @Override
-    public void addEpicsTest() {
-        epicArray = new ArrayList<>();
-        epicArray.add(new Epic("Эпик 1", "Описание эпика 1"));
-        epicArray.add(new Epic("Эпик 2", "Описание эпика 2"));
-        epicArray.add(new Epic("Эпик 3", "Описание эпика 3"));
-
-        for (int i = 0; i <= 2; i++) {
-            epicArray.get(i).setId(i + 4);
-        }
-
-        for (Epic epic : epicArray) {
-            manager.addEpic(epic);
-        }
+    @Test
+    void importFromServer_returnManagerWitOutSubTasks_withOutSubTasksDataSet() {
+        addTasksTest();
+        addEpicsTest();
+        manager.getTask(1);
+        manager.getEpic(4);
+        TaskManager fromServer = new HttpTaskManager("http://localhost:8078");
+        assertEquals(2, fromServer.getHistory().size());
+        assertEquals(3, fromServer.getTaskList().size());
+        assertEquals(3, fromServer.getEpicList().size());
+        assertTrue(fromServer.getSubTaskList().isEmpty());
+        assertTrue(fromServer.getEpic(4).getListSubTaskId().isEmpty());
     }
 
-    @Override
-    public void addSubTasksTest() {
-        subTaskArray = new ArrayList<>();
-        subTaskArray.add(new SubTask("Подзадача 1", "Описание подзадачи 1", 4, 45, "14.01.2023 10:30"));
-        subTaskArray.add(new SubTask("Подзадача 2", "Описание подзадачи 2", 4, 45, "14.01.2023 11:30"));
-        subTaskArray.add(new SubTask("Подзадача 3", "Описание подзадачи 3", 5, 45, "14.01.2023 12:30"));
-        subTaskArray.add(new SubTask("Подзадача 4", "Описание подзадачи 4", 5, 45, "14.01.2023 13:30"));
-        subTaskArray.add(new SubTask("Подзадача 5", "Описание подзадачи 5", 6, 45, "14.01.2023 14:30"));
-        subTaskArray.add(new SubTask("Подзадача 6", "Описание подзадачи 6", 6, 45, "14.01.2023 15:30"));
+    @Test
+    void importFromServer_returnManagerWitOutHistory_withOutHistoryDataSet() {
+        addTasksTest();
+        addEpicsTest();
+        addSubTasksTest();
+        TaskManager fromServer = new HttpTaskManager("http://localhost:8078");
+        assertTrue(fromServer.getHistory().isEmpty());
+        assertEquals(3, fromServer.getTaskList().size());
+        assertEquals(3, fromServer.getEpicList().size());
+        assertEquals(6, fromServer.getSubTaskList().size());
+    }
 
-        for (int i = 0; i <= 2; i++) {
-            subTaskArray.get(i).setId(i + 7);
-            subTaskArray.get(i + 3).setId(i + 10);
-        }
+    @Test
+    void importFromServer_returnEmptyManager_emptyDataSet() {
+        TaskManager fromServer =  new HttpTaskManager("http://localhost:8078");
+        assertEquals(0, fromServer.getHistory().size());
+        assertEquals(0, fromServer.getTaskList().size());
+        assertEquals(0, fromServer.getEpicList().size());
+        assertEquals(0, fromServer.getSubTaskList().size());
+    }
 
-        for (SubTask subTask : subTaskArray) {
-            manager.addSubTask(subTask);
-        }
+    @Test
+    void saveEmptyManager_returnEmptyManager_emptyDataSet() {
+        assertEquals(0, manager.getTaskList().size());
+        assertEquals(0, manager.getEpicList().size());
+        assertEquals(0, manager.getSubTaskList().size());
+        assertEquals(0, manager.getHistory().size());
+        TaskManager fromServer =  new HttpTaskManager("http://localhost:8078");
+        assertEquals(0, fromServer.getTaskList().size());
+        assertEquals(0, fromServer.getEpicList().size());
+        assertEquals(0, fromServer.getSubTaskList().size());
+        assertEquals(0, fromServer.getHistory().size());
+    }
+
+    @Test
+    void checkSaveManager_returnManagerWithThreeTasks_managerWithThreeTasks() {
+        TaskManager toServer =  new HttpTaskManager("http://localhost:8078");
+        Task task = new Task(Status.DONE, "Задача 1", "Описание задачи 1", 45, "16.01.2023 08:30");
+        Epic epic = new Epic(Status.DONE, "Родительская задача 1", "Описание родительской задачи 1");
+        SubTask subTask = new SubTask(Status.IN_PROGRESS, "Подзадача 1", "Описание подзадачи 1", 2, 45, "16.01.2023 09:30");
+        toServer.addTask(task);
+        toServer.addEpic(epic);
+        toServer.addSubTask(subTask);
+        toServer.getTask(1);
+        toServer.getSubTask(3);
+        TaskManager fromServer =  new HttpTaskManager("http://localhost:8078");
+        assertEquals(2, fromServer.getHistory().size());
+        assertEquals(task, fromServer.getTask(1));
+        assertEquals(epic, fromServer.getEpic(2));
+        assertEquals(1, fromServer.getSubTaskList().size());
     }
 }

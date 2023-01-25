@@ -1,4 +1,4 @@
-package ru.yandex.practicum.agolykh.kanban.managers.http.adapters;
+package ru.yandex.practicum.agolykh.kanban.adapters;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
@@ -10,8 +10,8 @@ import java.time.Duration;
 public class DurationAdapter extends TypeAdapter<Duration> {
     @Override
     public void write(final JsonWriter jsonWriter, final Duration duration) throws IOException {
-        if (duration == null) {
-            jsonWriter.value("null");
+        if(duration == null) {
+            jsonWriter.value(0);
             return;
         }
         jsonWriter.value(duration.toMinutes());
@@ -19,6 +19,6 @@ public class DurationAdapter extends TypeAdapter<Duration> {
 
     @Override
     public Duration read(final JsonReader jsonReader) throws IOException {
-        return Duration.ofMinutes(Integer.parseInt(jsonReader.nextString()));
+        return Duration.ofMinutes(jsonReader.nextInt());
     }
 }

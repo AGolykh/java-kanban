@@ -1,4 +1,4 @@
-package ru.yandex.practicum.agolykh.kanban.managers.http;
+package ru.yandex.practicum.agolykh.kanban.client;
 
 import java.io.IOException;
 import java.net.URI;
@@ -52,7 +52,7 @@ public class KVTaskClient {
         HttpResponse<String> response;
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            response.body();
+            return response.body();
         } catch (IOException | InterruptedException e) {
             System.out.println("Во время выполнения запроса ресурса по URL-адресу: '" + url + "', возникла ошибка.\n" +
                     "Проверьте, пожалуйста, адрес и повторите попытку.");

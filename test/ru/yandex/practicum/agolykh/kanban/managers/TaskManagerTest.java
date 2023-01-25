@@ -329,9 +329,9 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     public void addTasksTest() {
         taskArray = new ArrayList<>();
-        taskArray.add(new Task("Задача 1", "Описание задачи 1"));
-        taskArray.add(new Task("Задача 2", "Описание задачи 2"));
-        taskArray.add(new Task("Задача 3", "Описание задачи 3"));
+        taskArray.add(new Task("Задача 1", "Описание задачи 1", 45, "16.01.2023 08:30"));
+        taskArray.add(new Task("Задача 2", "Описание задачи 2", 45, "16.01.2023 09:30"));
+        taskArray.add(new Task("Задача 3", "Описание задачи 3", 45, "16.01.2023 10:30"));
         for (int i = 0; i <= 2; i++) {
             taskArray.get(i).setId(i + 1);
         }
@@ -358,12 +358,12 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     public void addSubTasksTest() {
         subTaskArray = new ArrayList<>();
-        subTaskArray.add(new SubTask("Подзадача 1", "Описание подзадачи 1", 4));
-        subTaskArray.add(new SubTask("Подзадача 2", "Описание подзадачи 2", 4));
-        subTaskArray.add(new SubTask("Подзадача 3", "Описание подзадачи 3", 5));
-        subTaskArray.add(new SubTask("Подзадача 4", "Описание подзадачи 4", 5));
-        subTaskArray.add(new SubTask("Подзадача 5", "Описание подзадачи 5", 6));
-        subTaskArray.add(new SubTask("Подзадача 6", "Описание подзадачи 6", 6));
+        subTaskArray.add(new SubTask("Подзадача 1", "Описание подзадачи 1", 4, 45, "16.01.2023 11:30"));
+        subTaskArray.add(new SubTask("Подзадача 2", "Описание подзадачи 2", 4, 45, "16.01.2023 12:30"));
+        subTaskArray.add(new SubTask("Подзадача 3", "Описание подзадачи 3", 5, 45, "16.01.2023 13:30"));
+        subTaskArray.add(new SubTask("Подзадача 4", "Описание подзадачи 4", 5, 45, "16.01.2023 15:30"));
+        subTaskArray.add(new SubTask("Подзадача 5", "Описание подзадачи 5", 6, 45, "16.01.2023 16:30"));
+        subTaskArray.add(new SubTask("Подзадача 6", "Описание подзадачи 6", 6, 45, "16.01.2023 17:30"));
 
         for (int i = 0; i <= 2; i++) {
             subTaskArray.get(i).setId(i + 7);

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.agolykh.kanban.server;
+package ru.yandex.practicum.agolykh.kanban.remote_server;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;

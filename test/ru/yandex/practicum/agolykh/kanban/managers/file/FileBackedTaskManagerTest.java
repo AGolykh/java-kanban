@@ -14,7 +14,7 @@ import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FileBackedTaskManagerTest extends TaskManagerTest {
+public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     public FileBackedTaskManagerTest() {
         super.setManager(Managers.getFileBacked("Tasks.csv"));
     }
@@ -25,15 +25,15 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
         final String fileName = "Normal.csv";
         final String path = dir + fileName;
         TaskManager fromFile;
-        fromFile = FileBackedTaskManager.loadFromFile(new File(path));
+        fromFile = FileBackedTaskManager.load(new File(path));
         assertEquals(6, fromFile.getHistory().size());
         assertEquals(3, fromFile.getTaskList().size());
         assertEquals(2, fromFile.getEpicList().size());
         assertEquals(5, fromFile.getSubTaskList().size());
         assertEquals(3, fromFile.getEpic(3).getListSubTaskId().size());
-        assertTrue(fromFile.getEpic(3).listSubTaskId.contains(4));
-        assertTrue(fromFile.getEpic(3).listSubTaskId.contains(5));
-        assertTrue(fromFile.getEpic(3).listSubTaskId.contains(17));
+        assertTrue(fromFile.getEpic(3).getListSubTaskId().contains(4));
+        assertTrue(fromFile.getEpic(3).getListSubTaskId().contains(5));
+        assertTrue(fromFile.getEpic(3).getListSubTaskId().contains(17));
     }
 
     @Test
@@ -42,7 +42,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
         final String fileName = "WithOutSubTasks.csv";
         final String path = dir + fileName;
         TaskManager fromFile;
-        fromFile = FileBackedTaskManager.loadFromFile(new File(path));
+        fromFile = FileBackedTaskManager.load(new File(path));
         assertEquals(4, fromFile.getHistory().size());
         assertEquals(3, fromFile.getTaskList().size());
         assertEquals(2, fromFile.getEpicList().size());
@@ -56,7 +56,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
         final String fileName = "WithOutHistory.csv";
         final String path = dir + fileName;
         TaskManager fromFile;
-        fromFile = FileBackedTaskManager.loadFromFile(new File(path));
+        fromFile = FileBackedTaskManager.load(new File(path));
         assertEquals(0, fromFile.getHistory().size());
         assertEquals(3, fromFile.getTaskList().size());
         assertEquals(2, fromFile.getEpicList().size());
@@ -69,7 +69,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
         final String fileName = "Empty.csv";
         final String path = dir + fileName;
         TaskManager fromFile;
-        fromFile = FileBackedTaskManager.loadFromFile(new File(path));
+        fromFile = FileBackedTaskManager.load(new File(path));
         assertEquals(0, fromFile.getHistory().size());
         assertEquals(0, fromFile.getTaskList().size());
         assertEquals(0, fromFile.getEpicList().size());
@@ -85,7 +85,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
                     final String fileName = "NullFile.csv";
                     final String path = dir + fileName;
                     TaskManager fromFile;
-                    fromFile = FileBackedTaskManager.loadFromFile(new File(path));
+                    fromFile = FileBackedTaskManager.load(new File(path));
                 }
         );
         assertEquals("Произошла ошибка при импорте данных из файла.", exception.getMessage());
@@ -102,7 +102,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
         assertEquals(0, toFile.getSubTaskList().size());
         assertEquals(0, toFile.getHistory().size());
         toFile.save();
-        FileBackedTaskManager fromFile = FileBackedTaskManager.loadFromFile(new File(path));
+        FileBackedTaskManager fromFile = FileBackedTaskManager.load(new File(path));
         assertEquals(0, fromFile.getTaskList().size());
         assertEquals(0, fromFile.getEpicList().size());
         assertEquals(0, fromFile.getSubTaskList().size());
@@ -124,7 +124,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest {
         toFile.getTask(1);
         toFile.getSubTask(3);
         toFile.save();
-        FileBackedTaskManager fromFile = FileBackedTaskManager.loadFromFile(new File(path));
+        FileBackedTaskManager fromFile = FileBackedTaskManager.load(new File(path));
         assertEquals(2, fromFile.getHistory().size());
         assertEquals(task, fromFile.getTask(1));
         assertEquals(epic, fromFile.getEpic(2));

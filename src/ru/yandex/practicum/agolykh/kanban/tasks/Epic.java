@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public class Epic extends Task {
-    public Set<Integer> listSubTaskId;
+    private final Set<Integer> listSubTaskId;
 
     public Epic(String name, String description) {
         super(name, description);

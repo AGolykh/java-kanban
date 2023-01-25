@@ -40,7 +40,6 @@ class CustomLinkedList<T extends Task> {
     private final HashMap<Integer, Node> nodeMap = new HashMap<>();
     private Node head;
     private Node tail;
-    private int size = 0;
 
     private class Node {
         private final T data;
@@ -52,10 +51,6 @@ class CustomLinkedList<T extends Task> {
             this.next = next;
             this.prev = prev;
         }
-    }
-
-    int size() {
-        return size;
     }
 
     Node get(int id) {
@@ -79,7 +74,6 @@ class CustomLinkedList<T extends Task> {
             lastElement.next = newElement;
             nodeMap.put(newElement.data.getId(), newElement);
         }
-        size++;
     }
 
     // Удаление ноды в связанном списке
@@ -104,7 +98,6 @@ class CustomLinkedList<T extends Task> {
         } else {
             next.prev = prev;
         }
-        size--;
     }
 
     // Получить список задач

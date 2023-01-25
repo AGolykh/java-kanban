@@ -23,12 +23,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public FileBackedTaskManager() {
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     // Создание экземпляра класса с данными из файла
-    public static FileBackedTaskManager loadFromFile(File file) {
+    public static FileBackedTaskManager load(File file) {
         FileBackedTaskManager result = new FileBackedTaskManager("Tasks.csv");
         ArrayList<SubTask> tempSubTaskList = new ArrayList<>();
         try (FileReader reader = new FileReader(file, StandardCharsets.UTF_8);
@@ -127,11 +123,37 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
+    public Task getTask(int id) {
+        Task task = super.getTask(id);
+        save();
+        return task;
+    }
+
+    @Override
+    public Epic getEpic(int id) {
+        Epic epic = super.getEpic(id);
+        save();
+        return epic;
+    }
+
+    @Override
+    public SubTask getSubTask(int id) {
+        SubTask subTask = super.getSubTask(id);
+        save();
+        return subTask;
+    }
+
+    @Override
+    public void makeListSubTaskForEpic() {
+        super.makeListSubTaskForEpic();
+        save();
+    }
+
+    @Override
     public void addTask(Task task) {
         super.addTask(task);
         save();
     }
-
 
     @Override
     public void addEpic(Epic epic) {

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.agolykh.kanban.managers.http.adapters;
+package ru.yandex.practicum.agolykh.kanban.adapters;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
     @Override
     public void write(final JsonWriter jsonWriter, final LocalDateTime localDateTime) throws IOException {
-        if (localDateTime == null) {
+        if(localDateTime == null) {
             jsonWriter.value("null");
             return;
         }
