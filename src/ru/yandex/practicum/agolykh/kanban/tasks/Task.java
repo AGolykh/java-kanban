@@ -20,19 +20,16 @@ public class Task {
     }
 
     public Task(String name, String description) {
-        this.type = TaskTypes.TASK;
         this.status = Status.NEW;
         this.name = name;
         this.description = description;
     }
 
-    public Task(Status status, String name, String description) {
-        this(name, description);
-        this.status = status;
-    }
-
     public Task(String name, String description, int duration, String startTime) {
-        this(name, description);
+        this.type = TaskTypes.TASK;
+        this.status = Status.NEW;
+        this.name = name;
+        this.description = description;
         this.duration = Duration.ofMinutes(duration);
         this.startTime = LocalDateTime.parse(startTime, Task.getFormatter());
         this.endTime = getEndTime();
@@ -146,82 +143,5 @@ public class Task {
                 && name.equals(task.name)
                 && description.equals(task.description);
     }
-
-/*    public static class TasksAdapter extends TypeAdapter<Task> {
-        @Override
-        public void write(final JsonWriter jsonWriter, final Task task) throws IOException {
-            Long optionalDuration = Optional.ofNullable(task.getDuration())
-                    .map(Duration::toMinutes)
-                    .orElse(null);
-            String optionalStartTime = Optional.ofNullable(task.getStartTime())
-                    .map((time) -> time.format(Task.getFormatter()))
-                    .orElse(null);
-            String optionalEndTime = Optional.ofNullable(task.getEndTime())
-                    .map((time) -> time.format(Task.getFormatter()))
-                    .orElse(null);
-
-            jsonWriter.beginObject();
-            jsonWriter.name("taskType");
-            jsonWriter.value(String.valueOf(task.getType()));
-            jsonWriter.name("id");
-            jsonWriter.value(task.getId());
-            jsonWriter.name("status");
-            jsonWriter.value(String.valueOf(task.getStatus()));
-            jsonWriter.name("name");
-            jsonWriter.value(task.getName());
-            jsonWriter.name("description");
-            jsonWriter.value(task.getDescription());
-            jsonWriter.name("duration");
-            jsonWriter.value(optionalDuration);
-            jsonWriter.name("startTime");
-            jsonWriter.value(optionalStartTime);
-            jsonWriter.name("endTime");
-            jsonWriter.value(optionalEndTime);
-            jsonWriter.endObject();
-        }
-
-        @Override
-        public Task read(final JsonReader jsonReader) throws IOException {
-            Task task = null;
-            jsonReader.beginObject();
-            String fieldName = null;
-            String fieldValue = null;
-            Integer fieldNumber = null;
-            while (jsonReader.hasNext()) {
-                JsonToken token = jsonReader.peek();
-                if(JsonToken.NAME.equals(token)) {
-                    token = jsonReader.peek();
-                    fieldName = jsonReader.nextName();
-                } else if(JsonToken.STRING.equals(token)) {
-                    token = jsonReader.peek();
-                    fieldValue = jsonReader.nextString();
-                } else if(JsonToken.NUMBER.equals(token)) {
-                    token = jsonReader.peek();
-                    fieldNumber = jsonReader.nextInt();
-                }
-
-                if ("taskType".equals(fieldName) && "TASK".equals(fieldValue)) {
-                    task = new Task(null, null);
-                } else if ("id".equals(fieldName) && JsonToken.NUMBER.equals(token)) {
-                    task.setId(fieldNumber);
-                } else if ("status".equals(fieldName) && JsonToken.STRING.equals(token)) {
-                    task.setStatus(Enum.valueOf(Status.class, fieldValue));
-                } else if ("name".equals(fieldName) && JsonToken.STRING.equals(token)) {
-                    task.setName(fieldValue);
-                } else if ("description".equals(fieldName) && JsonToken.STRING.equals(token)) {
-                    task.setDescription(fieldValue);
-                } else if ("duration".equals(fieldName) && JsonToken.NUMBER.equals(token)) {
-                    task.setDuration(Duration.ofMinutes(fieldNumber));
-                } else if ("startTime".equals(fieldName) && JsonToken.STRING.equals(token)) {
-                    task.setStartTime(LocalDateTime.parse(fieldValue, Task.getFormatter()));
-                } else if ("endTime".equals(fieldName) && JsonToken.STRING.equals(token)) {
-                    task.setEndTime();
-                } else if (JsonToken.END_OBJECT.equals(jsonReader.peek())) {
-                    jsonReader.endObject();
-                }
-            }
-            return task;
-        }
-    }*/
 }
 

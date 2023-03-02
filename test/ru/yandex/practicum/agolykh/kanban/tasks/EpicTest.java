@@ -21,11 +21,12 @@ class EpicTest {
     @BeforeEach
     void beforeEach() {
         testTaskManager.clearSubTaskList();
+        testTaskManager.reNewTimeList();
     }
 
     @Test
     void calculateStatus_returnNew_emptySubTasks() {
-        assertEquals(Status.NEW, testTaskManager.getEpic(1).getStatus());
+        assertEquals(Status.NEW, testTaskManager.getEpicById(1).getStatus());
     }
 
     @Test
@@ -33,12 +34,12 @@ class EpicTest {
         testTaskManager.addSubTask(
                 new SubTask("Новая подзадача 1",
                         "Описание новой подзадачи 1",
-                        1));
+                        1, 45, "16.01.2023 08:45"));
         testTaskManager.addSubTask(
                 new SubTask("Новая подзадача 2",
                         "Описание новой подзадачи 2",
-                        1));
-        assertEquals(Status.NEW, testTaskManager.getEpic(1).getStatus());
+                        1, 45, "16.01.2023 09:45"));
+        assertEquals(Status.NEW, testTaskManager.getEpicById(1).getStatus());
     }
 
     @Test
@@ -47,13 +48,13 @@ class EpicTest {
                 new SubTask(Status.DONE,
                         "Выполненная подзадача 1",
                         "Описание выполненной подзадачи 1",
-                        1));
+                        1, 45, "16.01.2023 08:45"));
         testTaskManager.addSubTask(
                 new SubTask(Status.DONE,
                 "Выполненная подзадача 2",
                 "Описание выполненной подзадачи 2",
-                1));
-        assertEquals(Status.DONE, testTaskManager.getEpic(1).getStatus());
+                1, 45, "16.01.2023 09:45"));
+        assertEquals(Status.DONE, testTaskManager.getEpicById(1).getStatus());
     }
 
     @Test
@@ -62,13 +63,13 @@ class EpicTest {
                 new SubTask(Status.NEW,
                         "Новая подзадача 1",
                         "Описание новой подзадачи 1",
-                        1));
+                        1, 45, "16.01.2023 08:45"));
         testTaskManager.addSubTask(
                 new SubTask(Status.DONE,
                         "Выполненная подзадача 2",
                         "Описание выполненной подзадачи 2",
-                        1));
-        assertEquals(Status.IN_PROGRESS, testTaskManager.getEpic(1).getStatus());
+                        1, 45, "16.01.2023 09:45"));
+        assertEquals(Status.IN_PROGRESS, testTaskManager.getEpicById(1).getStatus());
     }
 
     @Test
@@ -77,12 +78,12 @@ class EpicTest {
                 new SubTask(Status.IN_PROGRESS,
                         "Выполненная подзадача 1",
                         "Описание выполненной подзадачи 1",
-                        1));
+                        1, 45, "16.01.2023 08:45"));
         testTaskManager.addSubTask(
                 new SubTask(Status.IN_PROGRESS,
                         "Выполненная подзадача 2",
                         "Описание выполненной подзадачи 2",
-                        1));
-        assertEquals(Status.IN_PROGRESS, testTaskManager.getEpic(1).getStatus());
+                        1, 45, "16.01.2023 09:45"));
+        assertEquals(Status.IN_PROGRESS, testTaskManager.getEpicById(1).getStatus());
     }
 }

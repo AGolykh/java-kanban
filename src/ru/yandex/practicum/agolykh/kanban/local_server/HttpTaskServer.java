@@ -51,11 +51,6 @@ public class HttpTaskServer {
         taskServer.start();
     }
 
-    public void stop() {
-        System.out.println("Остановка сервера задач на порту " + this.port);
-        taskServer.stop(0);
-    }
-
     private static class TasksHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
@@ -119,7 +114,6 @@ public class HttpTaskServer {
             }
         }
 
-
         private void getAllSubTasks(HttpExchange exchange) throws IOException {
             if (exchange.getRequestURI().getQuery() != null) {
                 String[] pathElements = exchange.getRequestURI().getPath().split("/");
@@ -144,7 +138,7 @@ public class HttpTaskServer {
                 return;
             }
             try {
-                writeResponse(exchange, gson.toJson(manager.getTask(id.get())), 200);
+                writeResponse(exchange, gson.toJson(manager.getTaskById(id.get())), 200);
             } catch (NullPointerException e) {
                 writeResponse(exchange, e.getMessage(), 400);
             }
@@ -157,7 +151,7 @@ public class HttpTaskServer {
                 return;
             }
             try {
-                writeResponse(exchange, gson.toJson(manager.getEpic(id.get())), 200);
+                writeResponse(exchange, gson.toJson(manager.getEpicById(id.get())), 200);
             } catch (NullPointerException e) {
                 writeResponse(exchange, e.getMessage(), 400);
             }
@@ -170,21 +164,7 @@ public class HttpTaskServer {
                 return;
             }
             try {
-                writeResponse(exchange, gson.toJson(manager.getSubTask(id.get())), 200);
-            } catch (NullPointerException e) {
-                writeResponse(exchange, e.getMessage(), 400);
-            }
-        }
-
-        private void deleteTask(HttpExchange exchange) throws IOException {
-            Optional<Integer> id = getId(exchange);
-            if (id.isEmpty()) {
-                writeResponse(exchange, "Некорректный идентификатор задачи.", 400);
-                return;
-            }
-            try {
-                manager.deleteTask(id.get());
-                writeResponse(exchange, "Задача " + id.get() + " удалена.", 200);
+                writeResponse(exchange, gson.toJson(manager.getSubTaskById(id.get())), 200);
             } catch (NullPointerException e) {
                 writeResponse(exchange, e.getMessage(), 400);
             }
@@ -259,6 +239,20 @@ public class HttpTaskServer {
             writeResponse(exchange, "Подзадача обновлена.", 201);
         }
 
+        private void deleteTask(HttpExchange exchange) throws IOException {
+            Optional<Integer> id = getId(exchange);
+            if (id.isEmpty()) {
+                writeResponse(exchange, "Некорректный идентификатор задачи.", 400);
+                return;
+            }
+            try {
+                manager.deleteTaskById(id.get());
+                writeResponse(exchange, "Задача " + id.get() + " удалена.", 200);
+            } catch (NullPointerException e) {
+                writeResponse(exchange, e.getMessage(), 400);
+            }
+        }
+
         private void deleteEpic(HttpExchange exchange) throws IOException {
             Optional<Integer> id = getId(exchange);
             if (id.isEmpty()) {
@@ -266,7 +260,7 @@ public class HttpTaskServer {
                 return;
             }
             try {
-                manager.deleteEpic(id.get());
+                manager.deleteEpicById(id.get());
                 writeResponse(exchange, "Родительская задача " + id.get() + " удалена.", 200);
             } catch (NullPointerException e) {
                 writeResponse(exchange, e.getMessage(), 400);
@@ -280,7 +274,7 @@ public class HttpTaskServer {
                 return;
             }
             try {
-                manager.deleteSubTask(id.get());
+                manager.deleteSubTaskById(id.get());
                 writeResponse(exchange, "Подзадача " + id.get() + " удалена.", 200);
             } catch (NullPointerException e) {
                 writeResponse(exchange, e.getMessage(), 400);
@@ -314,7 +308,6 @@ public class HttpTaskServer {
             writeResponse(exchange, "Список подзадач очищен.", 200);
         }
 
-
         private void getSubTaskOfEpic(HttpExchange exchange) throws IOException {
             Optional<Integer> id = getId(exchange);
             if (id.isEmpty()) {
@@ -322,7 +315,7 @@ public class HttpTaskServer {
                 return;
             }
             try {
-                writeResponse(exchange, gson.toJson(manager.getSubTasksOfEpic(id.get())), 200);
+                writeResponse(exchange, gson.toJson(manager.getBindList(id.get())), 200);
             } catch (NullPointerException e) {
                 writeResponse(exchange, e.getMessage(), 400);
             }

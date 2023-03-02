@@ -1,22 +1,23 @@
 package ru.yandex.practicum.agolykh.kanban.managers.memory;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.agolykh.kanban.managers.history.HistoryManager;
 import ru.yandex.practicum.agolykh.kanban.managers.Managers;
 import ru.yandex.practicum.agolykh.kanban.managers.TaskManager;
-import ru.yandex.practicum.agolykh.kanban.tasks.Epic;
-import ru.yandex.practicum.agolykh.kanban.tasks.SubTask;
-import ru.yandex.practicum.agolykh.kanban.tasks.Task;
-import ru.yandex.practicum.agolykh.kanban.tasks.Status;
+import ru.yandex.practicum.agolykh.kanban.tasks.*;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
+@Slf4j
 public class InMemoryTaskManager implements TaskManager {
     private int nextId = 0;
     protected final Map<Integer, Task> taskList;
     protected final Map<Integer, Epic> epicList;
     protected final Map<Integer, SubTask> subTaskList;
+    protected  Map<LocalDateTime, Boolean> timeList;
     protected final HistoryManager history;
 
     public InMemoryTaskManager() {
@@ -24,65 +25,57 @@ public class InMemoryTaskManager implements TaskManager {
         epicList = new TreeMap<>();
         subTaskList = new TreeMap<>();
         history = Managers.getDefaultHistory();
+        timeList = Managers.getTimeList(2023);
     }
 
     // Получить список задач
-    public ArrayList<Task> getTaskList() {
-        return new ArrayList<>(taskList.values());
+    public Collection<Task> getTaskList() {
+        return taskList.values();
+    }
+
+    public void reNewTimeList() {
+        timeList = Managers.getTimeList(2025);
     }
 
     // Получить список родительски задач
-    public ArrayList<Epic> getEpicList() {
-        return new ArrayList<>(epicList.values());
+    public Collection<Epic> getEpicList() {
+        return epicList.values();
     }
 
     // Получить список подзадач
-    public ArrayList<SubTask> getSubTaskList() {
-        return new ArrayList<>(subTaskList.values());
+    public Collection<SubTask> getSubTaskList() {
+        return subTaskList.values();
     }
 
     // Получение всех подзадач определенного эпика
-    public ArrayList<SubTask> getSubTasksOfEpic(int id) {
-        ArrayList<SubTask> result = new ArrayList<>();
-        if (epicList.containsKey(id)) {
-            Epic epic = epicList.get(id);
-            for (Integer subTaskId : epic.getListSubTaskId()) {
-                if (subTaskList.containsKey(subTaskId)) {
-                    result.add(subTaskList.get(subTaskId));
-                }
-            }
-        }
-        return result;
+    public Collection<SubTask> getBindList(Integer epicId) {
+        containsTask(TaskTypes.EPIC, epicId);
+        return subTaskList
+                .values()
+                .stream()
+                .filter(subTask -> epicList.get(epicId).getListSubTaskId().contains(subTask.getId()))
+                .collect(Collectors.toList());
     }
 
     // Получение задачи по идентификатору
-    public Task getTask(int id) {
-        if (taskList.containsKey(id)) {
-            history.add(taskList.get(id));
-        } else {
-            throw new NullPointerException("Задача " + id + " не найдена.");
-        }
-        return taskList.get(id);
+    public Task getTaskById(Integer taskId) {
+        containsTask(TaskTypes.TASK, taskId);
+        history.add(taskList.get(taskId));
+        return taskList.get(taskId);
     }
 
     // Получение родительской задачи по идентификатору
-    public Epic getEpic(int id) {
-        if (epicList.containsKey(id)) {
-            history.add(epicList.get(id));
-        } else {
-            throw new NullPointerException("Родительская задача " + id + " не найдена.");
-        }
-        return epicList.get(id);
+    public Epic getEpicById(Integer epicId) {
+        containsTask(TaskTypes.EPIC, epicId);
+        history.add(epicList.get(epicId));
+        return epicList.get(epicId);
     }
 
     // Получение подзадачи по идентификатору
-    public SubTask getSubTask(int id) {
-        if (subTaskList.containsKey(id)) {
-            history.add(subTaskList.get(id));
-        } else {
-            throw new NullPointerException("Подзадача " + id + " не найдена.");
-        }
-        return subTaskList.get(id);
+    public SubTask getSubTaskById(Integer subTaskId) {
+        containsTask(TaskTypes.SUBTASK, subTaskId);
+        history.add(subTaskList.get(subTaskId));
+        return subTaskList.get(subTaskId);
     }
 
     // Расстановка id
@@ -99,6 +92,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (!validateTime(task)) {
             return;
         }
+        updateTimeList(true, task);
         task.setId(makeId(task.getId()));
         taskList.put(task.getId(), task);
         System.out.println("Задача " + task.getId() + " добавлена.");
@@ -108,7 +102,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void addEpic(Epic epic) {
         epic.setId(makeId(epic.getId()));
         epicList.put(epic.getId(), epic);
-        makeListSubTaskForEpic();
+        updateBindList(epic.getId());
         System.out.println("Родительская задача " + epic.getId() + " добавлена.");
     }
 
@@ -117,102 +111,86 @@ public class InMemoryTaskManager implements TaskManager {
         if (!validateTime(subTask)) {
             return;
         }
+        updateTimeList(true, subTask);
         subTask.setId(makeId(subTask.getId()));
         subTaskList.put(subTask.getId(), subTask);
-        makeListSubTaskForEpic();
+        updateBindList(subTask.getEpicId());
         System.out.println("Подзадача " + subTask.getId() + " добавлена.");
     }
 
-    public void makeListSubTaskForEpic() {
-        for (Epic epic : epicList.values()) {
-            for (SubTask subTask : subTaskList.values()) {
-                if(subTask.getEpicId() == epic.getId()) {
-                    epic.getListSubTaskId().add(subTask.getId());
-                    System.out.println("Подзадача " + subTask.getId() +
-                            " добавлена в родительскую задачу " + epic.getId() + '.');
-                    calculateEpic(epic.getId());
-                }
-            }
-        }
+    // Добавление в лист эпика подзадачи
+    public void updateBindList(Integer epicId) {
+        containsTask(TaskTypes.EPIC, epicId);
+        subTaskList.values()
+                .stream()
+                .filter(subTask -> subTask.getEpicId() == epicId)
+                .forEach(subTask -> epicList.get(epicId).getListSubTaskId().add(subTask.getId()));
+        calculateEpic(epicId);
     }
 
     // Обновить задачу
     public void updateTask(Task newTask) {
-        if (taskList.containsKey(newTask.getId())) {
-            taskList.put(newTask.getId(), newTask);
-            System.out.println("Задача " + newTask.getId() + " обновлена.");
-        } else {
-            throw new NullPointerException("Задача " + newTask.getId() + " не найдена.");
-        }
+        containsTask(TaskTypes.TASK, newTask.getId());
+        updateTimeList(false, taskList.get(newTask.getId()));
+        taskList.put(newTask.getId(), newTask);
+        updateTimeList(true, newTask);
+        System.out.println("Задача " + newTask.getId() + " обновлена.");
     }
 
     // Обновить родительскую задачу
     public void updateEpic(Epic newEpic) {
-        if (epicList.containsKey(newEpic.getId())) {
-            newEpic.setId(newEpic.getId());
-            epicList.put(newEpic.getId(), newEpic);
-            System.out.println("Родительская задача " + newEpic.getId() + " обновлена.");
-        } else {
-            throw new NullPointerException("Родительская задача " + newEpic.getId() + " не найдена.");
-        }
+        containsTask(TaskTypes.EPIC, newEpic.getId());
+        newEpic.setId(newEpic.getId());
+        epicList.put(newEpic.getId(), newEpic);
+        System.out.println("Родительская задача " + newEpic.getId() + " обновлена.");
     }
 
     // Обновить подзадачу
     public void updateSubTask(SubTask newSubTask) {
-        if (subTaskList.containsKey(newSubTask.getId())) {
-            newSubTask.setId(newSubTask.getId());
-            subTaskList.put(newSubTask.getId(), newSubTask);
-            System.out.println("Подзадача " + newSubTask.getId() + " обновлена.");
-            calculateEpic(newSubTask.getEpicId());
-        } else {
-            throw new NullPointerException("Подзадача " + newSubTask.getId() + " не найдена.");
-        }
+        containsTask(TaskTypes.SUBTASK, newSubTask.getId());
+        updateTimeList(false, subTaskList.get(newSubTask.getId()));
+        subTaskList.put(newSubTask.getId(), newSubTask);
+        updateTimeList(true, newSubTask);
+        calculateEpic(newSubTask.getEpicId());
+        System.out.println("Подзадача " + newSubTask.getId() + " обновлена.");
     }
 
     // Удалить задачу
-    public void deleteTask(int id) {
-        if (taskList.containsKey(id)) {
-            taskList.remove(id);
-            history.remove(id);
-            System.out.println("Задача " + id + " удалена.");
-        } else {
-            throw new NullPointerException("Задача " + id + " не найдена.");
-        }
+    public void deleteTaskById(Integer taskId) {
+        containsTask(TaskTypes.TASK, taskId);
+        updateTimeList(false, taskList.get(taskId));
+        taskList.remove(taskId);
+        history.remove(taskId);
+        System.out.println("Задача " + taskId + " удалена.");
     }
 
     // Удалить родительскую задачу и ее подзадачи
-    public void deleteEpic(int id) {
-        if (epicList.containsKey(id)) {
-            for (Integer subTaskId : epicList.get(id).getListSubTaskId()) {
-                if (subTaskList.containsKey(subTaskId)) {
-                    subTaskList.remove(subTaskId);
-                    history.remove(subTaskId);
-                    System.out.println("Подзадача " + subTaskId + " удалена.");
-                }
+    public void deleteEpicById(Integer epicId) {
+        containsTask(TaskTypes.EPIC, epicId);
+        for (Integer subTaskId : epicList.get(epicId).getListSubTaskId()) {
+            if (subTaskList.containsKey(subTaskId)) {
+                subTaskList.remove(subTaskId);
+                history.remove(subTaskId);
+                System.out.println("Подзадача " + subTaskId + " удалена.");
             }
-            epicList.remove(id);
-            history.remove(id);
-            System.out.println("Родительская задача " + id + " удалена.");
-        } else {
-            throw new NullPointerException("Родительская задача " + id + " не найдена.");
         }
+        epicList.remove(epicId);
+        history.remove(epicId);
+        System.out.println("Родительская задача " + epicId + " удалена.");
     }
 
     // Удалить подзадачу из основного списка и привязку у эпика
-    public void deleteSubTask(int id) {
-        if (subTaskList.containsKey(id)) {
-            SubTask subTask = subTaskList.get(id);
-            int epicId = subTask.getEpicId();
-            Epic epic = epicList.get(epicId);
-            epic.delSubTaskId(id);
-            subTaskList.remove(id);
-            history.remove(id);
-            epicList.put(epicId, epic);
-            calculateEpic(epicId);
-            System.out.println("Подзадача " + id + " удалена.");
-        } else {
-            throw new NullPointerException("Подзадача " + id + " не найдена.");
-        }
+    public void deleteSubTaskById(Integer subTaskId) {
+        containsTask(TaskTypes.SUBTASK, subTaskId);
+        Integer epicId = subTaskList.get(subTaskId).getEpicId();
+        Epic epic = epicList.get(epicId);
+        epic.delSubTaskId(subTaskId);
+        updateTimeList(false, subTaskList.get(subTaskId));
+        subTaskList.remove(subTaskId);
+        history.remove(subTaskId);
+        epicList.put(epicId, epic);
+        calculateEpic(epicId);
+        System.out.println("Подзадача " + subTaskId + " удалена.");
     }
 
     // Очистить список обычных задач
@@ -250,82 +228,72 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     // Расчет статуса и времени эпика
-    private void calculateEpic(int id) {
-        checkStatus(id);
-        calculateTime(id);
+    private void calculateEpic(Integer epicId) {
+        containsTask(TaskTypes.EPIC, epicId);
+        checkStatus(epicId);
+        calculateTime(epicId);
     }
 
-    // Проверка статуса эпика
-    private void checkStatus(int id) {
-        if (epicList.containsKey(id)) {
-            Set<Status> statusSet = new HashSet<>();
-            Epic epic = epicList.get(id);
-            Status oldStatus = epic.getStatus();
+    // Проверка статуса эпика   ********************* юзать стрим
+    private void checkStatus(Integer epicId) {
+        Epic epic = epicList.get(epicId);
+        Status oldStatus = epic.getStatus();
+        Set<Status> statusSet = subTaskList.values()
+                .stream()
+                .filter(subTask -> epicList.get(epicId).getListSubTaskId().contains(subTask.getId()))
+                .map(SubTask::getStatus)
+                .collect(Collectors.toSet());
 
-            for (Integer idSubTask : subTaskList.keySet()) {
-                for (Integer idSubTaskFromEpic : epic.getListSubTaskId()) {
-                    if (idSubTask.equals(idSubTaskFromEpic)) {
-                        SubTask subTask = subTaskList.get(idSubTask);
-                        statusSet.add(subTask.getStatus());
-                    }
-                }
-            }
-
-            if ((statusSet.contains(Status.NEW)
-                    && (statusSet.size() == 1))
-                    || statusSet.isEmpty()) {
-                epic.setStatus(Status.NEW);
-            } else if (statusSet.contains(Status.DONE)
-                    && (statusSet.size() == 1)) {
-                epic.setStatus(Status.DONE);
-            } else {
-                epic.setStatus(Status.IN_PROGRESS);
-            }
-            epicList.put(id, epic);
-            if (!oldStatus.equals(epic.getStatus())) {
-                System.out.println("Статус родительской задачи " + id + " обновлен.");
-            }
+        if ((statusSet.contains(Status.NEW)
+                && (statusSet.size() == 1))
+                || statusSet.isEmpty()) {
+            epic.setStatus(Status.NEW);
+        } else if (statusSet.contains(Status.DONE)
+                && (statusSet.size() == 1)) {
+            epic.setStatus(Status.DONE);
+        } else {
+            epic.setStatus(Status.IN_PROGRESS);
+        }
+        epicList.put(epicId, epic);
+        if (!oldStatus.equals(epic.getStatus())) {
+            System.out.println("Статус родительской задачи " + epicId + " обновлен.");
         }
     }
 
-    // Расчет времени для эпика
-    private void calculateTime(int id) {
+    // Расчет времени для эпика ***************** юзать стрим
+    private void calculateTime(Integer epicId) {
         TreeSet<SubTask> mapOfSubTask = new TreeSet<>(Comparator.comparing(Task::getStartTime));
-        if (epicList.containsKey(id)) {
-            Epic epic = epicList.get(id);
-            for (Integer idSubTask : subTaskList.keySet()) {
-                for (Integer idSubTaskFromEpic : epic.getListSubTaskId()) {
-                    if (idSubTask.equals(idSubTaskFromEpic)
-                            && subTaskList.get(idSubTask).getStartTime() != null) {
-                        mapOfSubTask.add(subTaskList.get(idSubTask));
-                    }
+        Epic epic = epicList.get(epicId);
+        for (Integer idSubTask : subTaskList.keySet()) {
+            for (Integer idSubTaskFromEpic : epic.getListSubTaskId()) {
+                if (idSubTask.equals(idSubTaskFromEpic)
+                        && subTaskList.get(idSubTask).getStartTime() != null) {
+                    mapOfSubTask.add(subTaskList.get(idSubTask));
                 }
             }
+        }
 
-            if(!mapOfSubTask.isEmpty()) {
-                epic.setStartTime(mapOfSubTask.first().getStartTime());
-                epic.setDuration(Duration.between(epic.getStartTime(),
-                        mapOfSubTask.last().getEndTime()));
-                epic.setEndTime();
-            }
+        if(!mapOfSubTask.isEmpty()) {
+            epic.setStartTime(mapOfSubTask.first().getStartTime());
+            epic.setDuration(Duration.between(epic.getStartTime(),
+                    mapOfSubTask.last().getEndTime()));
+            epic.setEndTime();
         }
     }
 
     // Проверка свободного времени
     private boolean validateTime(Task task) {
-        if (getPrioritizedTasks().isEmpty()) {
+        if(getPrioritizedTasks().isEmpty()) {
             return true;
         }
-        for (Task taskFromList : getPrioritizedTasks()) {
-            if ((taskFromList.getStartTime() != null) && (task.getStartTime() != null)) {
-                boolean startTimeValid = task.getStartTime().isBefore(taskFromList.getStartTime())
-                        && task.getEndTime().isBefore(taskFromList.getStartTime());
-                boolean endTimeValid = task.getStartTime().isAfter(taskFromList.getEndTime())
-                        && task.getEndTime().isAfter(taskFromList.getEndTime());
-                if (!startTimeValid && !endTimeValid) {
-                    return false;
-                }
+
+        LocalDateTime curTimeStamp = task.getStartTime();
+        while (curTimeStamp.isBefore(task.getEndTime())) {
+            if(timeList.get(curTimeStamp)) {
+                log.warn("Текущее время занято " + curTimeStamp);
+                return false;
             }
+            curTimeStamp = curTimeStamp.plusMinutes(15);
         }
         return true;
     }
@@ -349,10 +317,10 @@ public class InMemoryTaskManager implements TaskManager {
             }
         };
 
-        TreeSet<Task> treeSet = new TreeSet<>(generalComparator);
-        treeSet.addAll(taskList.values());
-        treeSet.addAll(subTaskList.values());
-        return treeSet;
+        TreeSet<Task> result = new TreeSet<>(generalComparator);
+        result.addAll(taskList.values());
+        result.addAll(subTaskList.values());
+        return result;
     }
 
     @Override
@@ -360,4 +328,44 @@ public class InMemoryTaskManager implements TaskManager {
         return history.getHistory();
     }
 
+    private void containsTask(TaskTypes types, Integer id) {
+        switch (types) {
+            case TASK -> {
+                if (!taskList.containsKey(id)) {
+                    String message = String.format("Task %d is not found.", id);
+                    log.warn(message);
+                    throw new NullPointerException(message);
+                }
+            }
+            case EPIC -> {
+                if (!epicList.containsKey(id)) {
+                    String message = String.format("Epic %d is not found.", id);
+                    log.warn(message);
+                    throw new NullPointerException(message);
+                }
+            }
+            case SUBTASK -> {
+                if (!subTaskList.containsKey(id)) {
+                    String message = String.format("Subtask %d is not found.", id);
+                    log.warn(message);
+                    throw new NullPointerException(message);
+                }
+            }
+        }
+    }
+
+    private void updateTimeList(boolean mode, Task task) {
+        LocalDateTime curTimeStamp = task.getStartTime();
+        if(mode) {
+            while (curTimeStamp.isBefore(task.getEndTime())) {
+                timeList.put(curTimeStamp, true);
+                curTimeStamp = curTimeStamp.plusMinutes(15);
+            }
+        } else {
+            while (curTimeStamp.isBefore(task.getEndTime())) {
+                timeList.put(curTimeStamp, false);
+                curTimeStamp = curTimeStamp.plusMinutes(15);
+            }
+        }
+    }
 }

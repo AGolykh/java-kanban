@@ -40,6 +40,7 @@ class HttpTaskManagerTest extends TaskManagerTest<HttpTaskManager> {
         manager.clearTaskList();
         manager.clearEpicList();
         manager.clearSubTaskList();
+        manager.reNewTimeList();
     }
 
     @Test
@@ -47,32 +48,32 @@ class HttpTaskManagerTest extends TaskManagerTest<HttpTaskManager> {
         addTasksTest();
         addEpicsTest();
         addSubTasksTest();
-        manager.getTask(1);
-        manager.getEpic(4);
-        manager.getSubTask(7);
+        manager.getTaskById(1);
+        manager.getEpicById(4);
+        manager.getSubTaskById(7);
         TaskManager fromServer = new HttpTaskManager("http://localhost:8078");
         assertEquals(3, fromServer.getHistory().size());
         assertEquals(3, fromServer.getTaskList().size());
         assertEquals(3, fromServer.getEpicList().size());
         assertEquals(6, fromServer.getSubTaskList().size());
-        assertEquals(2, fromServer.getEpic(4).getListSubTaskId().size());
-        assertTrue(fromServer.getEpic(4).getListSubTaskId().contains(7));
-        assertTrue(fromServer.getEpic(5).getListSubTaskId().contains(9));
-        assertTrue(fromServer.getEpic(6).getListSubTaskId().contains(11));
+        assertEquals(2, fromServer.getEpicById(4).getListSubTaskId().size());
+        assertTrue(fromServer.getEpicById(4).getListSubTaskId().contains(7));
+        assertTrue(fromServer.getEpicById(5).getListSubTaskId().contains(9));
+        assertTrue(fromServer.getEpicById(6).getListSubTaskId().contains(11));
     }
 
     @Test
     void importFromServer_returnManagerWitOutSubTasks_withOutSubTasksDataSet() {
         addTasksTest();
         addEpicsTest();
-        manager.getTask(1);
-        manager.getEpic(4);
+        manager.getTaskById(1);
+        manager.getEpicById(4);
         TaskManager fromServer = new HttpTaskManager("http://localhost:8078");
         assertEquals(2, fromServer.getHistory().size());
         assertEquals(3, fromServer.getTaskList().size());
         assertEquals(3, fromServer.getEpicList().size());
         assertTrue(fromServer.getSubTaskList().isEmpty());
-        assertTrue(fromServer.getEpic(4).getListSubTaskId().isEmpty());
+        assertTrue(fromServer.getEpicById(4).getListSubTaskId().isEmpty());
     }
 
     @Test
@@ -118,12 +119,12 @@ class HttpTaskManagerTest extends TaskManagerTest<HttpTaskManager> {
         toServer.addTask(task);
         toServer.addEpic(epic);
         toServer.addSubTask(subTask);
-        toServer.getTask(1);
-        toServer.getSubTask(3);
+        toServer.getTaskById(1);
+        toServer.getSubTaskById(3);
         TaskManager fromServer =  new HttpTaskManager("http://localhost:8078");
         assertEquals(2, fromServer.getHistory().size());
-        assertEquals(task, fromServer.getTask(1));
-        assertEquals(epic, fromServer.getEpic(2));
+        assertEquals(task, fromServer.getTaskById(1));
+        assertEquals(epic, fromServer.getEpicById(2));
         assertEquals(1, fromServer.getSubTaskList().size());
     }
 }
