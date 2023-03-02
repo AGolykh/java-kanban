@@ -1,6 +1,6 @@
 id,type,status,name,description,epicId,duration,dateTime,endTime
-1,TASK,DONE,Задача 1,Описание задачи 1,null,null,null,
-2,EPIC,IN_PROGRESS,Родительская задача 1,Описание родительской задачи 1,null,null,null,
-3,SUBTASK,IN_PROGRESS,Подзадача 1,Описание подзадачи 1,2,null,null,null,
+1,TASK,DONE,Задача 1,Описание задачи 1,45,16.01.2023 08:45,16.01.2023 09:30,
+2,EPIC,IN_PROGRESS,Родительская задача 1,Описание родительской задачи 1,45,16.01.2023 09:45,16.01.2023 10:30,
+3,SUBTASK,IN_PROGRESS,Подзадача 1,Описание подзадачи 1,2,45,16.01.2023 09:45,16.01.2023 10:30,
 
 3,1,

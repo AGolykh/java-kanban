@@ -13,15 +13,15 @@ class HistoryManagerTest {
     private static final Task task1 = new Task(
             Status.NEW,
             "Задача 1",
-            "Описание задачи 1");
+            "Описание задачи 1", 45, "16.01.2023 08:45");
     private static final Task task2 = new Task(
             Status.NEW,
             "Задача 2",
-            "Описание задачи 2");
+            "Описание задачи 2", 45, "16.01.2023 09:45");
     private static final Task task3 = new Task(
             Status.NEW,
             "Задача 3",
-            "Описание задачи 3");
+            "Описание задачи 3", 45, "16.01.2023 10:45");
 
     @BeforeEach
     void beforeEach() {

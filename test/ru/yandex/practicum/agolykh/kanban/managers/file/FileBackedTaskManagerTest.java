@@ -30,10 +30,10 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         assertEquals(3, fromFile.getTaskList().size());
         assertEquals(2, fromFile.getEpicList().size());
         assertEquals(5, fromFile.getSubTaskList().size());
-        assertEquals(3, fromFile.getEpic(3).getListSubTaskId().size());
-        assertTrue(fromFile.getEpic(3).getListSubTaskId().contains(4));
-        assertTrue(fromFile.getEpic(3).getListSubTaskId().contains(5));
-        assertTrue(fromFile.getEpic(3).getListSubTaskId().contains(17));
+        assertEquals(3, fromFile.getEpicById(3).getListSubTaskId().size());
+        assertTrue(fromFile.getEpicById(3).getListSubTaskId().contains(4));
+        assertTrue(fromFile.getEpicById(3).getListSubTaskId().contains(5));
+        assertTrue(fromFile.getEpicById(3).getListSubTaskId().contains(17));
     }
 
     @Test
@@ -47,7 +47,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         assertEquals(3, fromFile.getTaskList().size());
         assertEquals(2, fromFile.getEpicList().size());
         assertEquals(0, fromFile.getSubTaskList().size());
-        assertEquals(0, fromFile.getEpic(3).getListSubTaskId().size());
+        assertEquals(0, fromFile.getEpicById(3).getListSubTaskId().size());
     }
 
     @Test
@@ -115,19 +115,19 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         final String fileName = "FileForSavingFileBackedManager.csv";
         final String path = dir + fileName;
         FileBackedTaskManager toFile = new FileBackedTaskManager("FileForSavingFileBackedManager.csv");
-        Task task = new Task(Status.DONE, "Задача 1", "Описание задачи 1");
+        Task task = new Task(Status.DONE, "Задача 1", "Описание задачи 1", 45, "16.01.2023 08:45");
         Epic epic = new Epic(Status.DONE, "Родительская задача 1", "Описание родительской задачи 1");
-        SubTask subTask = new SubTask(Status.IN_PROGRESS, "Подзадача 1", "Описание подзадачи 1", 2);
+        SubTask subTask = new SubTask(Status.IN_PROGRESS, "Подзадача 1", "Описание подзадачи 1", 2, 45, "16.01.2023 09:45");
         toFile.addTask(task);
         toFile.addEpic(epic);
         toFile.addSubTask(subTask);
-        toFile.getTask(1);
-        toFile.getSubTask(3);
+        toFile.getTaskById(1);
+        toFile.getSubTaskById(3);
         toFile.save();
         FileBackedTaskManager fromFile = FileBackedTaskManager.load(new File(path));
         assertEquals(2, fromFile.getHistory().size());
-        assertEquals(task, fromFile.getTask(1));
-        assertEquals(epic, fromFile.getEpic(2));
+        assertEquals(task, fromFile.getTaskById(1));
+        assertEquals(epic, fromFile.getEpicById(2));
         assertEquals(1, fromFile.getSubTaskList().size());
     }
 }

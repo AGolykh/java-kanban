@@ -1,5 +1,6 @@
 package ru.yandex.practicum.agolykh.kanban.managers;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.agolykh.kanban.tasks.Epic;
 import ru.yandex.practicum.agolykh.kanban.tasks.Status;
@@ -19,6 +20,11 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     public void setManager(TaskManager manager) {
         TaskManagerTest.manager = manager;
+    }
+
+    @BeforeEach
+    void beforeEach() {
+        manager.reNewTimeList();
     }
 
     @Test
@@ -71,14 +77,14 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     void getSubTasksOfEpic_returnTwoSubTasksOfEpic_managerWithEpicsAndSubTasks() {
         addEpicsTest();
         addSubTasksTest();
-        assertTrue(manager.getEpic(4).getListSubTaskId().contains(7));
-        assertTrue(manager.getEpic(4).getListSubTaskId().contains(8));
+        assertTrue(manager.getEpicById(4).getListSubTaskId().contains(7));
+        assertTrue(manager.getEpicById(4).getListSubTaskId().contains(8));
     }
 
     @Test
     void getTask_returnTasks_managerWithTasks() {
         addTasksTest();
-        assertEquals(2, manager.getTask(2).getId());
+        assertEquals(2, manager.getTaskById(2).getId());
     }
 
     @Test
@@ -87,16 +93,16 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                 NullPointerException.class,
                 () -> {
                     addTasksTest();
-                    manager.getTask(100);
+                    manager.getTaskById(100);
                 }
         );
-        assertEquals("Задача " + 100 + " не найдена.", exception.getMessage());
+        assertEquals("Task 100 is not found.", exception.getMessage());
     }
 
     @Test
     void getEpic_returnEpics_managerWithEpics() {
         addEpicsTest();
-        assertEquals(4, manager.getEpic(4).getId());
+        assertEquals(4, manager.getEpicById(4).getId());
     }
 
     @Test
@@ -105,17 +111,17 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                 NullPointerException.class,
                 () -> {
                     addEpicsTest();
-                    manager.getEpic(100);
+                    manager.getEpicById(100);
                 }
         );
-        assertEquals("Родительская задача " + 100 + " не найдена.", exception.getMessage());
+        assertEquals("Epic 100 is not found.", exception.getMessage());
     }
 
     @Test
     void getSubTask_returnSubTasks_managerWithEpicsAndSubTasks() {
         addEpicsTest();
         addSubTasksTest();
-        assertEquals(8, manager.getSubTask(8).getId());
+        assertEquals(8, manager.getSubTaskById(8).getId());
     }
 
     @Test
@@ -125,10 +131,10 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                 () -> {
                     addEpicsTest();
                     addSubTasksTest();
-                    manager.getSubTask(100);
+                    manager.getSubTaskById(100);
                 }
         );
-        assertEquals("Подзадача " + 100 + " не найдена.", exception.getMessage());
+        assertEquals("Subtask 100 is not found.", exception.getMessage());
     }
 
     @Test
@@ -156,10 +162,10 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void checkSubTaskInEpic_returnTwoIdSubTasksOfEpic_managerWithEpicsAndSubTasks() {
         addEpicsTest();
-        assertTrue(manager.getEpic(4).getListSubTaskId().isEmpty());
+        assertTrue(manager.getEpicById(4).getListSubTaskId().isEmpty());
         addSubTasksTest();
-        assertTrue(manager.getEpic(4).getListSubTaskId().contains(manager.getSubTask(7).getId()));
-        assertTrue(manager.getEpic(4).getListSubTaskId().contains(manager.getSubTask(8).getId()));
+        assertTrue(manager.getEpicById(4).getListSubTaskId().contains(manager.getSubTaskById(7).getId()));
+        assertTrue(manager.getEpicById(4).getListSubTaskId().contains(manager.getSubTaskById(8).getId()));
     }
 
     @Test
@@ -169,52 +175,64 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(6, manager.getSubTaskList().size());
         addEpicsTest();
         addSubTasksTest();
-        assertEquals(4, manager.getSubTask(7).getEpicId());
+        assertEquals(4, manager.getSubTaskById(7).getEpicId());
     }
 
     @Test
     void updateTask_returnUpdatedTask_managerWithTasks() {
         addTasksTest();
-        Task task = manager.getTask(3);
+        Task task = manager.getTaskById(3);
         task.setStatus(Status.IN_PROGRESS);
         task.setName("Какая-то задача");
         task.setDescription("Какое-то описание");
         manager.updateTask(task);
-        assertEquals(task, manager.getTask(3));
+        assertEquals(task, manager.getTaskById(3));
+    }
+
+    @Test
+    void addTask_throwException_busyTime() {
+        addTasksTest();
+        Task task = new Task("Задача sfdsf", "Описание задачи fdsfd", 45, "16.01.2023 08:45");
+        task.setId(245);
+        manager.addTask(task);
+        final NullPointerException exception = assertThrows(
+                NullPointerException.class,
+                () -> manager.getTaskById(245)
+        );
     }
 
     @Test
     void updateEpic_returnUpdatedEpic_managerWithEpics() {
         addEpicsTest();
-        Epic epic = manager.getEpic(4);
+        Epic epic = manager.getEpicById(4);
         epic.setName("Какая-то задача");
         epic.setDescription("Какое-то описание");
         manager.updateEpic(epic);
-        assertEquals(epic, manager.getEpic(4));
+        assertEquals(epic, manager.getEpicById(4));
     }
 
     @Test
     void updateSubTask_returnUpdatedSubTask_managerWithEpicsAndSubTasks() {
         addEpicsTest();
         addSubTasksTest();
-        SubTask newSubTask = manager.getSubTask(7);
+        SubTask newSubTask = manager.getSubTaskById(7);
         newSubTask.setStatus(Status.IN_PROGRESS);
         newSubTask.setName("Какая-то задача");
         newSubTask.setDescription("Какое-то описание");
         manager.updateSubTask(newSubTask);
-        assertEquals(newSubTask, manager.getSubTask(7));
+        assertEquals(newSubTask, manager.getSubTaskById(7));
     }
 
     @Test
-    void deleteTask_returnExceptionAfterGetTask_managerWithTasks() {
+    void deleteTask_throwExceptionAfterGetTask_managerWithTasks() {
         addTasksTest();
-        assertEquals(2, manager.getTask(2).getId());
-        manager.deleteTask(2);
+        assertEquals(2, manager.getTaskById(2).getId());
+        manager.deleteTaskById(2);
         final NullPointerException exception = assertThrows(
                 NullPointerException.class,
-                () -> manager.getTask(2)
+                () -> manager.getTaskById(2)
         );
-        assertEquals("Задача " + 2 + " не найдена.", exception.getMessage());
+        assertEquals("Task 2 is not found.", exception.getMessage());
     }
 
     @Test
@@ -223,32 +241,32 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                 NullPointerException.class,
                 () -> {
                     addTasksTest();
-                    manager.deleteTask(100);
+                    manager.deleteTaskById(100);
                 }
         );
-        assertEquals("Задача " + 100 + " не найдена.", exception.getMessage());
+        assertEquals("Task 100 is not found.", exception.getMessage());
     }
 
     @Test
     void deleteEpicWithRemoveSubTasks_returnExceptionAfterGetEpicAndSubTask_managerWithEpicsAndSubTasks() {
         addEpicsTest();
         addSubTasksTest();
-        assertEquals(4, manager.getEpic(4).getId());
-        assertTrue(manager.getEpic(4).getListSubTaskId().contains(manager.getSubTask(7).getId()));
-        assertTrue(manager.getEpic(4).getListSubTaskId().contains(manager.getSubTask(8).getId()));
-        assertEquals(7, manager.getSubTask(7).getId());
-        manager.deleteEpic(4);
+        assertEquals(4, manager.getEpicById(4).getId());
+        assertTrue(manager.getEpicById(4).getListSubTaskId().contains(manager.getSubTaskById(7).getId()));
+        assertTrue(manager.getEpicById(4).getListSubTaskId().contains(manager.getSubTaskById(8).getId()));
+        assertEquals(7, manager.getSubTaskById(7).getId());
+        manager.deleteEpicById(4);
         final NullPointerException exception = assertThrows(
                 NullPointerException.class,
-                () -> manager.getEpic(4)
+                () -> manager.getEpicById(4)
         );
-        assertEquals("Родительская задача " + 4 + " не найдена.", exception.getMessage());
+        assertEquals("Epic 4 is not found.", exception.getMessage());
 
         final NullPointerException exception2 = assertThrows(
                 NullPointerException.class,
-                () -> manager.getSubTask(7)
+                () -> manager.getSubTaskById(7)
         );
-        assertEquals("Подзадача " + 7 + " не найдена.", exception2.getMessage());
+        assertEquals("Subtask 7 is not found.", exception2.getMessage());
     }
 
     @Test
@@ -257,27 +275,27 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                 NullPointerException.class,
                 () -> {
                     addEpicsTest();
-                    manager.deleteEpic(100);
+                    manager.deleteEpicById(100);
                 }
         );
-        assertEquals("Родительская задача " + 100 + " не найдена.", exception.getMessage());
+        assertEquals("Epic 100 is not found.", exception.getMessage());
     }
 
     @Test
     void deleteSubTask_returnExceptionAfterGetTask_managerWithEpicsAndSubTasks() {
         addEpicsTest();
         addSubTasksTest();
-        assertEquals(12, manager.getSubTask(12).getId());
-        manager.deleteSubTask(12);
+        assertEquals(12, manager.getSubTaskById(12).getId());
+        manager.deleteSubTaskById(12);
         final NullPointerException exception = assertThrows(
                 NullPointerException.class,
                 () -> {
                     addEpicsTest();
                     addSubTasksTest();
-                    manager.deleteSubTask(100);
+                    manager.deleteSubTaskById(100);
                 }
         );
-        assertEquals("Подзадача " + 100 + " не найдена.", exception.getMessage());
+        assertEquals("Subtask 100 is not found.", exception.getMessage());
     }
 
     @Test
@@ -287,10 +305,10 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                 () -> {
                     addEpicsTest();
                     addSubTasksTest();
-                    manager.deleteSubTask(100);
+                    manager.deleteSubTaskById(100);
                 }
         );
-        assertEquals("Подзадача " + 100 + " не найдена.", exception.getMessage());
+        assertEquals("Subtask 100 is not found.", exception.getMessage());
     }
 
     @Test

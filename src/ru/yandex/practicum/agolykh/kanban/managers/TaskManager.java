@@ -5,29 +5,30 @@ import ru.yandex.practicum.agolykh.kanban.tasks.SubTask;
 import ru.yandex.practicum.agolykh.kanban.tasks.Task;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Set;
 
 public interface TaskManager {
     // Получить список задач
-    ArrayList<Task> getTaskList();
+    Collection<Task> getTaskList();
 
     // Получить список родительски задач
-    ArrayList<Epic> getEpicList();
+    Collection<Epic> getEpicList();
 
     // Получить список подзадач
-    ArrayList<SubTask> getSubTaskList();
+    Collection<SubTask> getSubTaskList();
 
     // Получение всех подзадач определенного эпика
-    ArrayList<SubTask> getSubTasksOfEpic(int id);
+    Collection<SubTask> getBindList(Integer epicId);
 
     // Получение задачи по идентификатору
-    Task getTask(int id);
+    Task getTaskById(Integer taskId);
 
     // Получение родительской задачи по идентификатору
-    Epic getEpic(int id);
+    Epic getEpicById(Integer epicId);
 
     // Получение подзадачи по идентификатору
-    SubTask getSubTask(int id);
+    SubTask getSubTaskById(Integer subTaskId);
 
     // Добавить задачу
     void addTask(Task task);
@@ -48,13 +49,15 @@ public interface TaskManager {
     void updateSubTask(SubTask newSubTask);
 
     // Удалить задачу
-    void deleteTask(int id);
+    void deleteTaskById(Integer taskId);
 
     // Удалить родительскую задачу и ее подзадачи
-    void deleteEpic(int id);
+    void deleteEpicById(Integer epicId);
 
     // Удалить подзадачу из основного списка и привязку у эпика
-    void deleteSubTask(int id);
+    void deleteSubTaskById(Integer subTaskId);
+
+    void reNewTimeList();
 
     // Очистить список обычных задач
     void clearTaskList();

@@ -9,19 +9,12 @@ public class Converter {
     public static Task taskFromString(String value) {
         Task result;
         String[] elements = value.split(",");
-        if (elements[5].equals("null")) {
-            result = new Task(
-                    Enum.valueOf(Status.class, elements[2]),
-                    elements[3],
-                    elements[4]);
-        } else {
-            result = new Task(
-                    Enum.valueOf(Status.class, elements[2]),
-                    elements[3],
-                    elements[4],
-                    Integer.parseInt(elements[5]),
-                    elements[6]);
-        }
+        result = new Task(
+                Enum.valueOf(Status.class, elements[2]),
+                elements[3],
+                elements[4],
+                Integer.parseInt(elements[5]),
+                elements[6]);
         result.setId(Integer.parseInt(elements[0]));
         return result;
     }
@@ -39,21 +32,13 @@ public class Converter {
     public static SubTask subTaskFromString(String value) {
         SubTask result;
         String[] elements = value.split(",");
-        if (elements[6].equals("null")) {
-            result = new SubTask(
-                    Enum.valueOf(Status.class, elements[2]),
-                    elements[3],
-                    elements[4],
-                    Integer.parseInt(elements[5]));
-        } else {
-            result = new SubTask(
-                    Enum.valueOf(Status.class, elements[2]),
-                    elements[3],
-                    elements[4],
-                    Integer.parseInt(elements[5]),
-                    Integer.parseInt(elements[6]),
-                    elements[7]);
-        }
+        result = new SubTask(
+                Enum.valueOf(Status.class, elements[2]),
+                elements[3],
+                elements[4],
+                Integer.parseInt(elements[5]),
+                Integer.parseInt(elements[6]),
+                elements[7]);
         result.setId(Integer.parseInt(elements[0]));
         return result;
     }

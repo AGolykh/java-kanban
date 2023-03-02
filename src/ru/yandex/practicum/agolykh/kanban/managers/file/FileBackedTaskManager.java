@@ -23,7 +23,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public FileBackedTaskManager() {
     }
 
-    // Создание экземпляра класса с данными из файла
+    // Создание экземпляра класса с данными из файла ***************** юзать стрим
     public static FileBackedTaskManager load(File file) {
         FileBackedTaskManager result = new FileBackedTaskManager("Tasks.csv");
         ArrayList<SubTask> tempSubTaskList = new ArrayList<>();
@@ -73,7 +73,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    // Сохранение в файл
+    // Сохранение в файл ***************** юзать стрим
     public void save() {
         try (Writer fw = new FileWriter(path)) {
             fw.write("id,type,status,name,description,epicId,duration,dateTime,endTime\n");
@@ -111,7 +111,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return idsFromHistory.toString();
     }
 
-    // Восстановление истории с сохранением позиций в списке
+    // Восстановление истории с сохранением позиций в списке ***************** юзать стрим
     private static List<Integer> historyFromString(String value) {
         List<Integer> result = new ArrayList<>();
         String[] ids = value.split(",");
@@ -123,29 +123,29 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Task getTask(int id) {
-        Task task = super.getTask(id);
+    public Task getTaskById(Integer taskId) {
+        Task task = super.getTaskById(taskId);
         save();
         return task;
     }
 
     @Override
-    public Epic getEpic(int id) {
-        Epic epic = super.getEpic(id);
+    public Epic getEpicById(Integer epicId) {
+        Epic epic = super.getEpicById(epicId);
         save();
         return epic;
     }
 
     @Override
-    public SubTask getSubTask(int id) {
-        SubTask subTask = super.getSubTask(id);
+    public SubTask getSubTaskById(Integer subTaskId) {
+        SubTask subTask = super.getSubTaskById(subTaskId);
         save();
         return subTask;
     }
 
     @Override
-    public void makeListSubTaskForEpic() {
-        super.makeListSubTaskForEpic();
+    public void updateBindList(Integer epicId) {
+        super.updateBindList(epicId);
         save();
     }
 
@@ -186,20 +186,20 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void deleteTask(int id) {
-        super.deleteTask(id);
+    public void deleteTaskById(Integer taskId) {
+        super.deleteTaskById(taskId);
         save();
     }
 
     @Override
-    public void deleteEpic(int id) {
-        super.deleteEpic(id);
+    public void deleteEpicById(Integer epicId) {
+        super.deleteEpicById(epicId);
         save();
     }
 
     @Override
-    public void deleteSubTask(int id) {
-        super.deleteSubTask(id);
+    public void deleteSubTaskById(Integer subTaskId) {
+        super.deleteSubTaskById(subTaskId);
         save();
     }
 

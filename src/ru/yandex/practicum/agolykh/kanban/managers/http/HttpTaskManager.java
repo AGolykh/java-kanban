@@ -15,7 +15,6 @@ import ru.yandex.practicum.agolykh.kanban.tasks.Task;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Set;
 
 public class HttpTaskManager extends FileBackedTaskManager {
     private final KVTaskClient kvTaskClient;
@@ -65,7 +64,6 @@ public class HttpTaskManager extends FileBackedTaskManager {
                     }.getType());
             for (SubTask subTask : subTasksFromServer) {
                 addSubTask(subTask);
-                //subTaskList.put(subTask);
             }
         }
 
@@ -96,111 +94,5 @@ public class HttpTaskManager extends FileBackedTaskManager {
         kvTaskClient.put("epics", gson.toJson(getEpicList()));
         kvTaskClient.put("subtasks", gson.toJson(getSubTaskList()));
         kvTaskClient.put("history", gson.toJson(history));
-    }
-
-    @Override
-    public ArrayList<Task> getTaskList() {
-        return super.getTaskList();
-    }
-
-    @Override
-    public ArrayList<Epic> getEpicList() {
-        return super.getEpicList();
-    }
-
-    @Override
-    public ArrayList<SubTask> getSubTaskList() {
-        return super.getSubTaskList();
-    }
-
-    @Override
-    public ArrayList<SubTask> getSubTasksOfEpic(int id) {
-        return super.getSubTasksOfEpic(id);
-    }
-
-    @Override
-    public Task getTask(int id) {
-        return super.getTask(id);
-    }
-
-    @Override
-    public Epic getEpic(int id) {
-        return super.getEpic(id);
-    }
-
-    @Override
-    public SubTask getSubTask(int id) {
-        return super.getSubTask(id);
-    }
-
-    @Override
-    public void addTask(Task task) {
-        super.addTask(task);
-    }
-
-    @Override
-    public void addEpic(Epic epic) {
-        super.addEpic(epic);
-    }
-
-    @Override
-    public void addSubTask(SubTask subTask) {
-        super.addSubTask(subTask);
-    }
-
-    @Override
-    public void updateTask(Task newTask) {
-        super.updateTask(newTask);
-    }
-
-    @Override
-    public void updateEpic(Epic newEpic) {
-        super.updateEpic(newEpic);
-    }
-
-    @Override
-    public void updateSubTask(SubTask newSubTask) {
-        super.updateSubTask(newSubTask);
-    }
-
-    @Override
-    public void deleteTask(int id) {
-        super.deleteTask(id);
-    }
-
-    @Override
-    public void deleteEpic(int id) {
-        super.deleteEpic(id);
-    }
-
-    @Override
-    public void deleteSubTask(int id) {
-        super.deleteSubTask(id);
-    }
-
-
-    @Override
-    public void clearTaskList() {
-        super.clearTaskList();
-    }
-
-    @Override
-    public void clearEpicList() {
-        super.clearEpicList();
-    }
-
-    @Override
-    public void clearSubTaskList() {
-        super.clearSubTaskList();
-    }
-
-    @Override
-    public Set<Task> getPrioritizedTasks() {
-        return super.getPrioritizedTasks();
-    }
-
-    @Override
-    public ArrayList<Task> getHistory() {
-        return super.getHistory();
     }
 }
